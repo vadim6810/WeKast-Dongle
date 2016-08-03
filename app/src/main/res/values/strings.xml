@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">WekastAndroidDongle</string>
+    <string name="hotspotIp">192.168.43.1</string>
+    <string name="hotspotPort">8888</string>
+    <string name="socketServerPort">8888</string>
+    <string name="addressEditTextHint">Server ip address</string>
+    <string name="portEditTextHint">Server port number</string>
+    <string name="connectButtonText">Connect...</string>
+    <string name="clearButtonText">Clear</string>
+    <string name="captionViewText">DONGLE</string>
+
+    <string name="ssid">wekast</string>
+    <string name="pass">12345678</string>
+
+    <string name="TAG">wekast</string>
+</resources>
