@@ -16,11 +16,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.model.Client;
 import com.wekast.wekastandroiddongle.model.DongleBroadcastReceiver;
 import com.wekast.wekastandroiddongle.model.DongleService;
+import com.wekast.wekastandroiddongle.model.IsHotspotEnabledService;
 import com.wekast.wekastandroiddongle.model.WifiController;
 
 import java.util.List;
@@ -47,18 +49,25 @@ public class TestConnWithClientActivity extends AppCompatActivity {
 
     DongleBroadcastReceiver dongleReceiver;
 
+    boolean mBounded;
+    IsHotspotEnabledService isHotspotEnabledService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
 
-
         wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         registerDongleBroadcastReceiver();
 
         wifiController = new WifiController(wifiManager);
+        isWifiEnabled();
         connectToWifiHotspot();
         initViewElements();
+
+
+//        startService(new Intent(this, IsHotspotEnabledService.class));
+//        stopService(new Intent(this, IsHotspotEnabledService.class));
     }
 
     @Override
@@ -67,7 +76,25 @@ public class TestConnWithClientActivity extends AppCompatActivity {
         Log.d(TAG, "TestConnWithClientActivity.onStart()");
         startDongleService();
         Log.d(TAG, "TestConnWithClientActivity.onStart():  isMyServiceRunning():" + isMyServiceRunning());
+        Intent mIntent = new Intent(this, IsHotspotEnabledService.class);
+        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
     }
+
+    ServiceConnection mConnection = new ServiceConnection() {
+
+        public void onServiceDisconnected(ComponentName name) {
+            Toast.makeText(TestConnWithClientActivity.this, "Service is disconnected", Toast.LENGTH_SHORT).show();
+            mBounded = false;
+            isHotspotEnabledService = null;
+        }
+
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Toast.makeText(TestConnWithClientActivity.this, "Service is connected", Toast.LENGTH_SHORT).show();
+            mBounded = true;
+            IsHotspotEnabledService.LocalBinder mLocalBinder = (IsHotspotEnabledService.LocalBinder)service;
+            isHotspotEnabledService = mLocalBinder.getServerInstance();
+        }
+    };
 
     @Override
     protected void onPause() {
@@ -95,6 +122,10 @@ public class TestConnWithClientActivity extends AppCompatActivity {
             isBound = false;
         }
         // TODO: check if service is stoped
+        if(mBounded) {
+            unbindService(mConnection);
+            mBounded = false;
+        }
     }
 
     @Override
@@ -208,4 +239,19 @@ public class TestConnWithClientActivity extends AppCompatActivity {
         super.registerReceiver(dongleReceiver, filters);
         wifiManager.startScan();
     }
+
+    private void isWifiEnabled() {
+        if(!wifiController.isWifiOn(context)) {
+            wifiController.turnOnOffWifi(context, true);
+            //job completed. Rest for 5 second before doing another one
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //do job again
+            isWifiEnabled();
+        }
+    }
+
 }
