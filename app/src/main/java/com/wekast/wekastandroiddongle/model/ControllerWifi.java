@@ -8,13 +8,13 @@ import android.util.Log;
 /**
  * Created by YEHUDA on 8/1/2016.
  */
-public class WifiController {
+public class ControllerWifi {
+
     private static final String TAG = "wekastdongle";
     public WifiManager wifiManager;
     public WifiConfiguration wifiConfig;
 
-
-    public WifiController(WifiManager wifiManager) {
+    public ControllerWifi(WifiManager wifiManager) {
         this.wifiManager = wifiManager;
     }
 
@@ -22,11 +22,11 @@ public class WifiController {
      * Function check whether wifi is enabled
      *
      * @param context
-     * @return
+     * @return whether wifi is enabled
      */
     public boolean isWifiOn(Context context) {
         boolean isWifiOn = wifiManager.isWifiEnabled();
-        Log.d(TAG, "MainActivity.isWifiOn(): " + isWifiOn);
+        Log.d(TAG, "ControllerWifi.isWifiOn(): " + isWifiOn);
         return isWifiOn;
     }
 
@@ -38,25 +38,28 @@ public class WifiController {
      */
     public void turnOnOffWifi(Context context, boolean b) {
         wifiManager.setWifiEnabled(b);
-        Log.d(TAG, "MainActivity.turnOnOffWifi(): " + b);
+        Log.d(TAG, "ControllerWifi.turnOnOffWifi(): " + b);
     }
 
     /**
-     * Function that configuretes WifiConfiguration for connecting to hotspot
-     *
-     * @return configured WifiConfiguration
+     * Function that configures WifiConfiguration for access point
      */
     public void configureWifiConfig(String ssid, String pass) {
         wifiConfig = new WifiConfiguration();
         wifiConfig.SSID = "\"".concat(ssid).concat("\"");
         wifiConfig.preSharedKey = "\"".concat(pass).concat("\"");
         wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-        Log.d(TAG, "MainActivity.configureWifiConfig():\n" + wifiConfig);
+//        Log.d(TAG, "ControllerWifi.configureWifiConfig():\n" + wifiConfig);
     }
 
-    public WifiConfiguration getWifiConfig() {
-        return wifiConfig;
-    }
+//    /**
+//     * Function that returns current configured configuration
+//     *
+//     * @return current configured wificonfiguration
+//     */
+//    public WifiConfiguration getWifiConfig() {
+//        return wifiConfig;
+//    }
 
 
     /* Function to disconnect from the currently connected WiFi AP.
@@ -98,6 +101,47 @@ public class WifiController {
     public void reconnectToWifi() {
         if (!wifiManager.reconnect()) {
             Log.d("TAG", "Failed to connect!");
+        }
+    }
+
+    /**
+     * Waiting while wifi is loading
+     * @param context
+     */
+    private void waitWifiTurnOn(Context context) {
+        turnOnOffWifi(context, true);
+        if(!isWifiOn(context)) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            waitWifiTurnOn(context);
+        }
+    }
+
+    /**
+     * Converts int ip address to readable string
+     *
+     * @param ipAddr
+     * @return readable ip address string
+     */
+    public String getIpAddr(int ipAddr) {
+        String ipString = String.format(
+                "%d.%d.%d.%d",
+                (ipAddr & 0xff),
+                (ipAddr >> 8 & 0xff),
+                (ipAddr >> 16 & 0xff),
+                (ipAddr >> 24 & 0xff));
+        return ipString;
+    }
+
+    public void waitWhileWifiLoading() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Log.d(TAG, "ControllerAccessPoint.waitWifi():  " + e);
         }
     }
 }
