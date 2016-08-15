@@ -9,6 +9,7 @@
     <string name="clearButtonText">Clear</string>
     <string name="captionViewText">DONGLE</string>
 
+    <!-- Default Access Point settings  -->
     <string name="ssid">wekast</string>
     <string name="pass">12345678</string>
 
