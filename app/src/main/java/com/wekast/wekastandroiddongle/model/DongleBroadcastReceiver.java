@@ -13,7 +13,7 @@ import android.widget.Toast;
 public class DongleBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = "wekastdongle";
 
-    WifiController wifiController;
+    ControllerWifi wifiController;
 
     public DongleBroadcastReceiver() {
         Log.d(TAG, "DongleBroadcastReceiver");
@@ -21,6 +21,8 @@ public class DongleBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "DongleBroadcastReceiver onReceive()");
+
         int curState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
 
         if(curState == WifiManager.WIFI_STATE_ENABLED) {
