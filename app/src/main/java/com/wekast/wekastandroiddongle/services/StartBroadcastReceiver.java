@@ -1,4 +1,4 @@
-package com.wekast.wekastandroiddongle.model;
+package com.wekast.wekastandroiddongle.services;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,7 +18,6 @@ public class StartBroadcastReceiver extends BroadcastReceiver {
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             Intent pushIntent = new Intent(context, DongleService.class);
             context.startService(pushIntent);
-//            context.startService(new Intent(context, AccessPointService.class));
         }
     }
 }

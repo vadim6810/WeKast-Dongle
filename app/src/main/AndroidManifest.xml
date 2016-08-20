@@ -26,14 +26,14 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name="com.wekast.wekastandroiddongle.model.StartBroadcastReceiver">
+        <receiver android:name="com.wekast.wekastandroiddongle.services.StartBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <service android:name="com.wekast.wekastandroiddongle.model.DongleService" />
-        <service android:name="com.wekast.wekastandroiddongle.model.AccessPointService" />
+        <service android:name="com.wekast.wekastandroiddongle.services.DongleService" />
+        <service android:name="com.wekast.wekastandroiddongle.services.AccessPointService" />
 
     </application>
 

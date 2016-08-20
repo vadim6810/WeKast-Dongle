@@ -1,4 +1,4 @@
-package com.wekast.wekastandroiddongle.model;
+package com.wekast.wekastandroiddongle.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -33,6 +33,12 @@ public class Utils {
     public static final String WORK_DIRECTORY = "WeKast/";
     public static final File DIRECTORY = new File(DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY);
 
+    // SharedPreferences keys
+    // WIFI_STATE_BEFORE_LAUNCH_APP
+    // ACCESS_POINT_STATE_BEFORE_LAUNCH_APP
+    // ACCESS_POINT_SSID_ON_APP
+    // ACCESS_POINT_PASS_ON_APP
+
 
     public static void initWorkFolder() {
         File file = new File(DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY);
@@ -62,6 +68,12 @@ public class Utils {
     public static void toastShow(Context context, String s) {
         Toast toast = Toast.makeText(context, s, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+    }
+
+    public static void toastShowBottom(Context context, String s) {
+        Toast toast = Toast.makeText(context, s, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER|Gravity.BOTTOM, 0, 0);
         toast.show();
     }
 
@@ -106,4 +118,5 @@ public class Utils {
         }
         return arrayList;
     }
+
 }

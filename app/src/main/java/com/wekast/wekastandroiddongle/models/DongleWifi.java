@@ -1,56 +1,52 @@
-package com.wekast.wekastandroiddongle.model;
+package com.wekast.wekastandroiddongle.models;
 
-import android.app.IntentService;
-import android.content.Intent;
+import android.app.Activity;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.wekast.wekastandroiddongle.controllers.ControllerAccessPoint;
+import com.wekast.wekastandroiddongle.controllers.ControllerWifi;
+import com.wekast.wekastandroiddongle.Utils.Utils;
+
 import java.util.List;
 
 /**
- * Created by YEHUDA on 8/1/2016.
+ * Created by ELAD on 8/20/2016.
  */
-public class AccessPointService extends IntentService {
+public class DongleWifi {
 
     private static final String TAG = "wekastdongle";
-    Context context = this;
-    WifiManager wifiManager;
-    ControllerWifi wifiController;
-    ControllerAccessPoint accessPointController;
+    private Context mainActivityContext = null;
+    private Activity mainActivity = null;
+    private WifiManager wifiManager = null;
+    private ControllerWifi wifiController = null;
+    private ControllerAccessPoint accessPointController = null;
 
-    public AccessPointService() {
-        super("APService");
+    public DongleWifi(Activity activity) {
+        this.mainActivity = activity;
+        this.mainActivityContext = mainActivity.getApplicationContext();
+        this.wifiManager = (WifiManager) mainActivityContext.getSystemService(mainActivityContext.WIFI_SERVICE);
+        this.wifiController = new ControllerWifi(wifiManager);
+        this.accessPointController = new ControllerAccessPoint(wifiManager, wifiController);
     }
 
-    public void onCreate() {
-        super.onCreate();
-        Log.d(TAG, "AccessPointService.onCreate()");
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "AccessPointService.onDestroy()");
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        wifiManager = (WifiManager) getSystemService(context.WIFI_SERVICE);
-        wifiController = new ControllerWifi(wifiManager);
-        accessPointController = new ControllerAccessPoint(wifiManager, wifiController);
+    public boolean connectToAccessPoint(){
         // Disable access point
-        accessPointController.setAccessPointEnabled(context, false);
+        accessPointController.setAccessPointEnabled(mainActivity, false);
 
         // Prepare configuration for wifi connection
-        String curSsid = Utils.getFieldSP(context, "accessPointSSID");
-        String curPass = Utils.getFieldSP(context, "accessPointPASS");
+        String curSsid = Utils.getFieldSP(mainActivity, "accessPointSSID");
+        String curPass = Utils.getFieldSP(mainActivity, "accessPointPASS");
         wifiController.configureWifiConfig(curSsid, curPass);
 
         // Switch on wifi
-        wifiController.turnOnOffWifi(context, true);
+        wifiController.turnOnOffWifi(mainActivity, true);
 
         // Wait while wifi module is loading
         wifiController.waitWhileWifiLoading();
@@ -64,7 +60,7 @@ public class AccessPointService extends IntentService {
             }
         }
 
-        // Connect to default dongle access point
+        // Connect to access point of application
         int netId = wifiController.addWifiConfiguration();
         if (netId != -1) {
             List<WifiConfiguration> list2 = wifiManager.getConfiguredNetworks();
@@ -75,20 +71,31 @@ public class AccessPointService extends IntentService {
                     wifiController.reconnectToWifi();
                     Log.d(TAG, "MainActivity.connectToWifiHotspot(): connected to "
                             + wifiController.wifiConfig.SSID + " with netId " + netId);
-                    showMessage(curSsid);
                     break;
                 }
             }
         }
+
+        isWifiLoaded();
+        showMessage("Connected to WiFi " + curSsid);
         Log.d(TAG, "AccessPointService.onHandleIntent(): end ");
+        return true;
     }
 
-    private void showMessage(final String ssid) {
+    private void isWifiLoaded() {
+        if (!wifiController.isWifiConnected(mainActivity)) {
+            wifiController.waitWhileWifiLoading(1000);
+            isWifiLoaded();
+        }
+
+    }
+
+    private void showMessage(final String message) {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Utils.toastShow(getApplicationContext(), "Trying to connect to " + ssid);
+                Utils.toastShowBottom(mainActivityContext, message);
             }
         });
     }

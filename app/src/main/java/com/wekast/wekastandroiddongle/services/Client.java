@@ -1,4 +1,4 @@
-package com.wekast.wekastandroiddongle.model;
+package com.wekast.wekastandroiddongle.services;
 
 import android.os.AsyncTask;
 import android.util.Log;

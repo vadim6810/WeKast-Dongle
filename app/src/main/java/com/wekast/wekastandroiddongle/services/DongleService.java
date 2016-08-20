@@ -1,4 +1,4 @@
-package com.wekast.wekastandroiddongle.model;
+package com.wekast.wekastandroiddongle.services;
 
 import android.app.Service;
 import android.content.Intent;
@@ -7,7 +7,9 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.wekast.wekastandroiddongle.R;
+import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.activity.MainActivity;
+import com.wekast.wekastandroiddongle.models.DongleWifi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +42,7 @@ public class DongleService extends Service {
 
     public DongleService() {
         Thread socketServerThread = new Thread(new SocketDongleServerThread());
-        socketServerThread.setName("DongleSocketServier");
+        socketServerThread.setName("DongleSocketServer");
         socketServerThread.start();
         Log.d(TAG, "DongleService() - socketServerThread.getName(): " + socketServerThread.getName());
     }
@@ -84,24 +86,24 @@ public class DongleService extends Service {
 //        Log.d(TAG, "DongleService.show(" + slideNumber + ") called");
 //    }
 
-    public void saveAccessPointConfig(final String ssid, final String pass) {
-
+    public void saveAccessPointConfig(JSONObject jsonObject) throws JSONException {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Utils.toastShow(activity, "DongleService test message");
+                Utils.toastShowBottom(activity, "Received wifi config from application. Connecting...");
             }
         });
 
-        Utils.setFieldSP(activity, "accessPointSSID", ssid);
-        Utils.setFieldSP(activity, "accessPointPASS", pass);
+        // Save received ssid and pass in shared preferences
+        Utils.setFieldSP(activity, "ACCESS_POINT_SSID_ON_APP", jsonObject.getString("ssid"));
+        Utils.setFieldSP(activity, "ACCESS_POINT_PASS_ON_APP", jsonObject.getString("pass"));
 
-        Intent serviceIntent = new Intent(activity, AccessPointService.class);
-        activity.startService(serviceIntent);
+        // Connect to Access Point of application
+        DongleWifi dongleWifi = new DongleWifi(activity);
+        dongleWifi.connectToAccessPoint();
     }
 
     private class SocketDongleServerThread extends Thread {
-
         int count = 0;
 
         @Override
@@ -135,16 +137,20 @@ public class DongleService extends Service {
                         jsonTask = jsonRootObject.optJSONArray("task");
                         for(int i=0; i < jsonTask.length(); i++){
                             JSONObject jsonObject = jsonTask.getJSONObject(i);
-                            String curCommmand = jsonObject.getString("command").toString();
-                            if (curCommmand.equals("show")) {
-                                int slide = jsonObject.getInt("slide");
-//                                show(slide);
-                            }
-                            if (curCommmand.equals("accessPointConfig")) {
-                                String ssid = jsonObject.getString("ssid");
-                                String pass = jsonObject.getString("pass");
-                                saveAccessPointConfig(ssid, pass);
-                            }
+//                            String curDevice = jsonObject.getString("device").toString();
+//                            if (curDevice.equals("android")) {
+                                String curCommmand = jsonObject.getString("command").toString();
+                                if (curCommmand.equals("show")) {
+                                    int slide = jsonObject.getInt("slide");
+                                    // show(slide);
+                                }
+                                if (curCommmand.equals("accessPointConfig")) {
+                                    saveAccessPointConfig(jsonObject);
+                                }
+//                            }
+//                            if (curDevice.equals("ios")) {
+//
+//                            }
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

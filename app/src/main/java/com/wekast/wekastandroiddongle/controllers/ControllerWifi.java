@@ -1,6 +1,8 @@
-package com.wekast.wekastandroiddongle.model;
+package com.wekast.wekastandroiddongle.controllers;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -144,4 +146,28 @@ public class ControllerWifi {
             Log.d(TAG, "ControllerAccessPoint.waitWifi():  " + e);
         }
     }
+
+    public void waitWhileWifiLoading(int time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Log.d(TAG, "ControllerAccessPoint.waitWifi():  " + e);
+        }
+    }
+
+    public boolean isWifiConnected(Context context) {
+        boolean isWifiConnected = true;
+        ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getActiveNetworkInfo();
+        if (mWifi == null) {
+            return false;
+        } else {
+            if (mWifi.isConnected())
+                return isWifiConnected;
+        }
+        // TODO: check when application came here. Or refactor
+        return isWifiConnected;
+    }
+
 }

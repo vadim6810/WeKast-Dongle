@@ -4,51 +4,35 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.wekast.wekastandroiddongle.R;
-import com.wekast.wekastandroiddongle.model.Client;
-import com.wekast.wekastandroiddongle.model.ControllerAccessPoint;
-import com.wekast.wekastandroiddongle.model.ControllerWifi;
-import com.wekast.wekastandroiddongle.model.DongleService;
-
-import java.util.List;
+import com.wekast.wekastandroiddongle.controllers.ControllerAccessPoint;
+import com.wekast.wekastandroiddongle.controllers.ControllerWifi;
+import com.wekast.wekastandroiddongle.services.DongleService;
+import com.wekast.wekastandroiddongle.Utils.Utils;
+import com.wekast.wekastandroiddongle.models.DongleAccessPoint;
 
 /**
  * Created by YEHUDA on 8/1/2016.
  */
-//public class MainActivity extends AppCompatActivity implements ServiceCallbacks {
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "wekastdongle";
-    EditText editTextAddress;
-    EditText editTextPort;
-    Button buttonConnect;
-    Button buttonClear;
-    public TextView response;
-
-
-    public WifiManager wifiManager;
-
     Context context = this;
     DongleService dongleService;
     boolean isBound = false;
 
-    ControllerWifi wifiController;
-    ControllerAccessPoint accessPointController;
+    public WifiManager wifiManager = null;
+    ControllerWifi wifiController = null;
+    ControllerAccessPoint accessPointController = null;
+    DongleAccessPoint wifiAccessPoint = null;
 
-    boolean mBounded;
+//    DongleBroadcastReceiver dongleReceiver;
 
     ServiceConnection serviceConnection;
     private void bindDongleService() {
@@ -80,14 +64,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // hide action bar
         getSupportActionBar().hide();
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        View decorView = getWindow().getDecorView();
+//        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_FULLSCREEN;
+//        decorView.setSystemUiVisibility(uiOptions);
         setContentView(R.layout.activity_main);
+
+        // add permission - android.permission.WAKE_LOCK
+//        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK|PowerManager.ON_AFTER_RELEASE, "server");
+//        wakeLock.acquire();
 
         wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         wifiController = new ControllerWifi(wifiManager);
         accessPointController = new ControllerAccessPoint(wifiManager, wifiController);
 
-        initViewElements();
-        startAccessPoint();
+        // TODO: save wifi adapter state, access point state to shared preferences
+        saveWifiAdapterState();
+
+        // Create and start Access Point
+        initializeWifiAccessPoint();
+
         Log.d(TAG, "MainActivity.onCreate()");
     }
 
@@ -119,151 +117,46 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Log.d(TAG, "MainActivity.onStop()");
         // unbind DongleService
-//        if (isBound) {
-//        myService.setCallbacks(null); // unregister
-//            unbindService(serviceConnection);
-//            isBound = false;
-//        }
+        if (isBound) {
+            unbindService(serviceConnection);
+            isBound = false;
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        accessPointController.setAccessPointEnabled(context, false);
+        wifiAccessPoint.destroyAccessPoint();
+        wifiController.turnOnOffWifi(this, false);
         this.finish();
         Log.d(TAG, "MainActivity.onDestroy()");
     }
 
-    private void connectToWifiHotspot() {
-
-        wifiController.configureWifiConfig(getText(R.string.ssid).toString(), getText(R.string.pass).toString());
-//        wifiController.connectToSelectedNetwork(getText(R.string.ssid).toString(), getText(R.string.pass).toString(),
-//                wifiController.getWifiConfig());
-
-        // Remove wifi configuration with default dongle access point SSID if exists
-        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-        for (WifiConfiguration i : list) {
-            if (i.SSID.equals(wifiController.wifiConfig.SSID)) {
-                wifiManager.removeNetwork(i.networkId);
-            }
+    private void saveWifiAdapterState() {
+        // TODO: Do we need this stuff on Dongle?
+        Boolean isWifiEnabled = wifiController.isWifiOn(MainActivity.this);
+        // TODO: save access point state to isAccessPointEnabled
+        if(isWifiEnabled) {
+            Utils.setFieldSP(MainActivity.this, "WIFI_STATE_BEFORE_LAUNCH_APP", isWifiEnabled.toString());
+            Utils.setFieldSP(MainActivity.this, "ACCESS_POINT_STATE_BEFORE_LAUNCH_APP", "false");
+            // TODO: save connected wifi ssid
+        } else {
+            Utils.setFieldSP(MainActivity.this, "WIFI_STATE_BEFORE_LAUNCH_APP", isWifiEnabled.toString());
+            Utils.setFieldSP(MainActivity.this, "ACCESS_POINT_STATE_BEFORE_LAUNCH_APP", "false");
         }
-
-        // Connect to default dongle access point
-        int netId = wifiController.addWifiConfiguration();
-        if (netId != -1) {
-            List<WifiConfiguration> list2 = wifiManager.getConfiguredNetworks();
-            for (WifiConfiguration i : list2) {
-                if (i.SSID != null && i.SSID.equals(wifiController.wifiConfig.SSID)) {
-                    wifiController.disconnectFromWifi();
-                    wifiController.enableDisableWifiNetwork(i.networkId, true);
-                    wifiController.reconnectToWifi();
-                    Log.d(TAG, "MainActivity.connectToWifiHotspot(): connected to "
-                            + wifiController.wifiConfig.SSID + " with netId " + netId);
-                    break;
-                }
-            }
-        }
-
     }
 
-    /**
-     * Ititialization of view elements with listeners
-     */
-    private void initViewElements() {
-        editTextAddress = (EditText) findViewById(R.id.addressEditText);
-        editTextPort = (EditText) findViewById(R.id.portEditText);
-        buttonConnect = (Button) findViewById(R.id.connectButton);
-        buttonClear = (Button) findViewById(R.id.clearButton);
-        response = (TextView) findViewById(R.id.responseTextView);
-
-        buttonConnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                Client myClient = new Client(editTextAddress.getText()
-                        .toString(), Integer.parseInt(editTextPort
-                        .getText().toString()), response);
-                myClient.execute();
-            }
-        });
-
-        buttonClear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                response.setText("");
-//                if (isBound) {
-//                    dongleService.upload();
-//                }
-
-            }
-        });
-    }
-
-
-
-//    private boolean isMyServiceRunning() {
-////        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-////        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-////            if ("com.ehuda.dongle.model.DongleService".equals(service.service.getClassName())) {
-////                return true;
-////            }
-////        }
-////        return false;
-//
-//        String serviceName = "com.wekast.wekastandroiddongle.model.DongleService";
-//        boolean serviceRunning = false;
-//        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
-//        List<ActivityManager.RunningServiceInfo> l = am.getRunningServices(Integer.MAX_VALUE);
-//        Iterator<ActivityManager.RunningServiceInfo> i = l.iterator();
-//        while (i.hasNext()) {
-//            ActivityManager.RunningServiceInfo runningServiceInfo = (ActivityManager.RunningServiceInfo) i
-//                    .next();
-//            if(runningServiceInfo.service.getClassName().equals(serviceName)){
-//                serviceRunning = true;
-////                if(runningServiceInfo.service.foreground)
-////                {
-////                    //service run in foreground
-////                }
-//            }
-//        }
-//        return serviceRunning;
-//    }
-
-//    private void registerDongleBroadcastReceiver() {
-//        dongleReceiver = new DongleBroadcastReceiver();
-//        final IntentFilter filters = new IntentFilter();
-//        filters.addAction("android.net.wifi.WIFI_STATE_CHANGED");
-//        filters.addAction("android.net.wifi.STATE_CHANGE");
-//        super.registerReceiver(dongleReceiver, filters);
-//        wifiManager.startScan();
-//    }
-
-    /**
-     * Starts access point
-      */
-    private void startAccessPoint() {
-        accessPointController.configureWifiConfig(getResources().getString(R.string.ssid),
-                getResources().getString(R.string.pass));
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Settings.System.canWrite(context)) {
-                Log.d(TAG, "MainActivity.startAccessPoint() Settings.System.canWrite(context)? true");
-            } else {
-                Intent grantIntent = new   Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                startActivity(grantIntent);
-                Log.d(TAG, "MainActivity.startAccessPoint() Settings.System.canWrite(context)? false");
+    private void initializeWifiAccessPoint (){
+        wifiAccessPoint = new DongleAccessPoint(this);
+        while(!wifiAccessPoint.createAccessPoint())
+        {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
-
-        // Turn off wifi before enabling Access Point
-        if (wifiController.isWifiOn(context)) {
-            wifiController.turnOnOffWifi(context, false);
-        }
-
-        // Turn on access point
-        accessPointController.setAccessPointEnabled(context, true);
-
-        // If not to wait application crashes
-        accessPointController.waitAccessPoint();
+        Utils.toastShowBottom(this, "Default Access Point started");
     }
 
 }

@@ -1,15 +1,10 @@
-package com.wekast.wekastandroiddongle.model;
+package com.wekast.wekastandroiddongle.controllers;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.provider.Settings;
 import android.util.Log;
-
-import com.wekast.wekastandroiddongle.R;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -85,6 +80,7 @@ public class ControllerAccessPoint {
 
     public boolean setAccessPointEnabled(Context context, boolean enabled)  {
         try {
+            // TODO: when disable - setWifiApEnabled.invoke(wifiManager, null, enabled)
             boolean curStatus = (Boolean) setWifiApEnabled.invoke(wifiManager, wifiConfig, enabled);
             Log.d(TAG, "ControllerAccessPoint.setWifiApEnabled(): " + curStatus);
             return curStatus;
