@@ -2,8 +2,6 @@ package com.wekast.wekastandroiddongle.models;
 
 import android.app.Activity;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -33,14 +31,17 @@ public class DongleWifi {
         this.mainActivityContext = mainActivity.getApplicationContext();
         this.wifiManager = (WifiManager) mainActivityContext.getSystemService(mainActivityContext.WIFI_SERVICE);
         this.wifiController = new ControllerWifi(wifiManager);
-        this.accessPointController = new ControllerAccessPoint(wifiManager, wifiController);
+        this.accessPointController = new ControllerAccessPoint(wifiManager);
     }
 
     public boolean connectToAccessPoint(){
         // Disable access point
         accessPointController.setAccessPointEnabled(mainActivity, false);
 
-        // Prepare configuration for wifi connection
+        // wait more while access point on application is loading
+//        accessPointController.waitAccessPointTurnOff();
+
+        // Configure WifiConfiguration for default dongle access point
         String curSsid = Utils.getFieldSP(mainActivity, "accessPointSSID");
         String curPass = Utils.getFieldSP(mainActivity, "accessPointPASS");
         wifiController.configureWifiConfig(curSsid, curPass);
@@ -49,8 +50,11 @@ public class DongleWifi {
         wifiController.turnOnOffWifi(mainActivity, true);
 
         // Wait while wifi module is loading
-        wifiController.waitWhileWifiLoading();
+//        wifiController.waitWhileWifiTurnOnOff();
 
+        Log.i(TAG, "DongleWifi.connectToAccessPoint() isWifiOn: " + wifiController.isWifiOn(mainActivityContext));
+
+        // Remove wifi configuration with default dongle access point SSID if exists
         List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
         if(list != null) {
             for (WifiConfiguration i : list) {
@@ -76,18 +80,40 @@ public class DongleWifi {
             }
         }
 
-        isWifiLoaded();
+        // Wait while wifi establish connection
+        waitWifiConnect();
         showMessage("Connected to WiFi " + curSsid);
         Log.d(TAG, "AccessPointService.onHandleIntent(): end ");
         return true;
     }
 
-    private void isWifiLoaded() {
-        if (!wifiController.isWifiConnected(mainActivity)) {
-            wifiController.waitWhileWifiLoading(1000);
-            isWifiLoaded();
+    private void waitWifiConnect() {
+        // Wait while wifi starting
+        while (!wifiController.isWifiOn(mainActivityContext)) {
+            wifiController.waitWhileWifiTurnOnOff(1000);
         }
 
+        long timeStart = System.currentTimeMillis();
+        long timeEnd = System.currentTimeMillis();
+        double timeElapsed = 0;
+        Log.i(TAG, "DongleWifi.connectToAccessPoint() isWifiOn: " + wifiController.isWifiOn(mainActivityContext));
+
+        // Wait while wifi connecting
+        while (!wifiController.isWifiConnected(mainActivity)) {
+            wifiController.waitWhileWifiTurnOnOff(1000);
+            timeEnd = System.currentTimeMillis();
+            timeElapsed = (timeEnd - timeStart)/ 1000.0;
+
+            // TODO: set to 180 ( 3 min )
+            // If Dongle can't connect to Access Point on client, start one more time Dongle Access Point
+            if (timeElapsed > 30.0) {
+                DongleAccessPoint dongleAccessPoint = new DongleAccessPoint(mainActivity);
+                dongleAccessPoint.createAccessPoint();
+                // java.lang.RuntimeException: Can't create handler inside thread that has not called Looper.prepare()
+                // Utils.toastShowBottom(mainActivityContext, "Default Access Point started");
+                Log.d(TAG, "DongleWifi.waitWifiConnect() ");
+            }
+        }
     }
 
     private void showMessage(final String message) {
@@ -99,4 +125,5 @@ public class DongleWifi {
             }
         });
     }
+
 }

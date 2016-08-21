@@ -12,8 +12,6 @@ import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.controllers.ControllerAccessPoint;
 import com.wekast.wekastandroiddongle.controllers.ControllerWifi;
 
-import java.lang.reflect.Method;
-
 /**
  * Created by ELAD on 8/20/2016.
  */
@@ -31,7 +29,7 @@ public class DongleAccessPoint {
         this.mainActivityContext = mainActivity.getApplicationContext();
         this.wifiManager = (WifiManager) mainActivityContext.getSystemService(mainActivityContext.WIFI_SERVICE);
         this.wifiController = new ControllerWifi(wifiManager);
-        this.accessPointController = new ControllerAccessPoint(wifiManager, wifiController);
+        this.accessPointController = new ControllerAccessPoint(wifiManager);
     }
 
     /**
@@ -57,20 +55,16 @@ public class DongleAccessPoint {
         }
 
         // Turn off wifi before enabling Access Point
-        if (wifiController.isWifiOn(mainActivity)) {
-            wifiController.turnOnOffWifi(mainActivity, false);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        wifiController.turnOnOffWifi(mainActivity, false);
+        while (wifiController.isWifiOn(mainActivity)) {
+            wifiController.waitWhileWifiTurnOnOff(1000);
         }
 
         // Turn on access point
         accessPointController.setAccessPointEnabled(mainActivity, true);
 
-        // If not to wait application crashes
-        accessPointController.waitAccessPoint();
+        // Wait while Access Point loading
+        accessPointController.waitAccessPointTurnOn();
         return true;
     }
 

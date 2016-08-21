@@ -14,69 +14,29 @@ import java.lang.reflect.Method;
  */
 public class ControllerAccessPoint {
     private static final String TAG = "wekastClient";
-    private static Method getWifiApState;
-    private static Method isWifiApEnabled;
     private static Method setWifiApEnabled;
-    private static Method getWifiApConfiguration;
+    private static Method isWifiApEnabled;
 
     public WifiManager wifiManager;
     public WifiConfiguration wifiConfig;
-//    public ControllerWifi wifiController;
 
     static {
         // lookup methods and fields not defined publicly in the SDK.
         Class<?> cls = WifiManager.class;
         for (Method method : cls.getDeclaredMethods()) {
             String methodName = method.getName();
-            if (methodName.equals("getAccessPointState")) {
-                getWifiApState = method;
-            } else if (methodName.equals("isAccessPointEnabled")) {
-                isWifiApEnabled = method;
-            } else if (methodName.equals("setWifiApEnabled")) {
+            if (methodName.equals("setWifiApEnabled")) {
                 setWifiApEnabled = method;
-            } else if (methodName.equals("getAccessPointConfiguration")) {
-                getWifiApConfiguration = method;
+            }
+            if (methodName.equals("isWifiApEnabled")) {
+                isWifiApEnabled = method;
             }
         }
     }
 
-    public static boolean isApSupported() {
-        return (getWifiApState != null && isWifiApEnabled != null
-                && setWifiApEnabled != null && getWifiApConfiguration != null);
-    }
-
-    public ControllerAccessPoint(WifiManager wifiManager, ControllerWifi wifiController) {
+    public ControllerAccessPoint(WifiManager wifiManager) {
         this.wifiManager = wifiManager;
-//        this.wifiController = wifiController;
     }
-
-    // ERROR not working
-//    public boolean isAccessPointEnabled() {
-//        try {
-//            return (Boolean) isWifiApEnabled.invoke(wifiManager);
-//        } catch (Exception e) {
-//            Log.d(TAG, "ControllerAccessPoint.isAccessPointEnabled(): " + e.toString(), e); // shouldn't happen
-//            return false;
-//        }
-//    }
-
-//    public int getAccessPointState() {
-//        try {
-//            return (Integer) getWifiApState.invoke(wifiManager);
-//        } catch (Exception e) {
-//            Log.d(TAG, "ControllerAccessPoint.getAccessPointState(): " + e.toString(), e); // shouldn't happen
-//            return -1;
-//        }
-//    }
-
-//    public WifiConfiguration getAccessPointConfiguration() {
-//        try {
-//            return (WifiConfiguration) getWifiApConfiguration.invoke(wifiManager);
-//        } catch (Exception e) {
-//            Log.d(TAG, "ControllerAccessPoint.getAccessPointConfiguration(): " + e.toString(), e); // shouldn't happen
-//            return null;
-//        }
-//    }
 
     public boolean setAccessPointEnabled(Context context, boolean enabled)  {
         try {
@@ -108,13 +68,41 @@ public class ControllerAccessPoint {
         // Log.d(TAG, "ControllerAccessPoint.configureWifiConfig():\n" + wifiConfig);
     }
 
-    public void waitAccessPoint() {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            Log.d(TAG, "ControllerAccessPoint.waitAccessPoint():  " + e);
+    public void waitAccessPointTurnOn() {
+        while (!isAccessPointEnabled()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Log.d(TAG, "ControllerAccessPoint.waitAccessPoint():  " + e);
+            }
         }
+        Log.d(TAG, "ControllerAccessPoint.waitAccessPointTurnOn() isAccessPointEnabled - true");
+    }
+
+//    public void waitAccessPointTurnOff() {
+//        while (isAccessPointEnabled()) {
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        Log.d(TAG, "ControllerAccessPoint.waitAccessPointTurnOn() isAccessPointEnabled - false");
+//    }
+
+    public boolean isAccessPointEnabled() {
+        Boolean isAccessPointEnabled = false;
+        try {
+            isAccessPointEnabled = (Boolean) WifiManager.class.getDeclaredMethod("isWifiApEnabled").invoke(wifiManager);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return isAccessPointEnabled;
     }
 
 }

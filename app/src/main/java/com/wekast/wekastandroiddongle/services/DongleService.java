@@ -49,6 +49,7 @@ public class DongleService extends Service {
 
     @Override
     public void onCreate() {
+
         Log.d(TAG, "DongleService.onCreate() called");
     }
 
@@ -112,6 +113,7 @@ public class DongleService extends Service {
             OutputStream outputStream = null;
             try {
                 String socketServerPort = getText(R.string.socketServerPort).toString();
+                Log.d(TAG, "DongleService.SocketDongleServerThread socketServerPort: " + socketServerPort);
                 serverSocket = new ServerSocket(Integer.valueOf(socketServerPort));
                 while (true) {
                     Socket socket = serverSocket.accept();
@@ -132,13 +134,14 @@ public class DongleService extends Service {
 
                     JSONObject  jsonRootObject = null;
                     JSONArray jsonTask = null;
+                    String curDevice = "";
                     try {
                         jsonRootObject = new JSONObject(task);
-                        jsonTask = jsonRootObject.optJSONArray("task");
-                        for(int i=0; i < jsonTask.length(); i++){
-                            JSONObject jsonObject = jsonTask.getJSONObject(i);
-//                            String curDevice = jsonObject.getString("device").toString();
-//                            if (curDevice.equals("android")) {
+                        curDevice = jsonRootObject.getString("device");
+                        if (curDevice.equals("android")) {
+                            jsonTask = jsonRootObject.optJSONArray("task");
+                            for(int i=0; i < jsonTask.length(); i++){
+                                JSONObject jsonObject = jsonTask.getJSONObject(i);
                                 String curCommmand = jsonObject.getString("command").toString();
                                 if (curCommmand.equals("show")) {
                                     int slide = jsonObject.getInt("slide");
@@ -147,13 +150,13 @@ public class DongleService extends Service {
                                 if (curCommmand.equals("accessPointConfig")) {
                                     saveAccessPointConfig(jsonObject);
                                 }
-//                            }
-//                            if (curDevice.equals("ios")) {
-//
-//                            }
+                            }
+                        }
+                        if (curDevice.equals("ios")) {
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        Log.d(TAG, "DongleService.run(): " + e);
                     }
 
                     SocketDongleServerReplyThread socketServerReplyThread = new SocketDongleServerReplyThread(

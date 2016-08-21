@@ -138,7 +138,7 @@ public class ControllerWifi {
         return ipString;
     }
 
-    public void waitWhileWifiLoading() {
+    public void waitWhileWifiTurnOnOff() {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -147,7 +147,7 @@ public class ControllerWifi {
         }
     }
 
-    public void waitWhileWifiLoading(int time) {
+    public void waitWhileWifiTurnOnOff(int time) {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {

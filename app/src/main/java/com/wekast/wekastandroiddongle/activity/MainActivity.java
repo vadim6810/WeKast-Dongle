@@ -23,18 +23,17 @@ import com.wekast.wekastandroiddongle.models.DongleAccessPoint;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "wekastdongle";
-    Context context = this;
-    DongleService dongleService;
-    boolean isBound = false;
+    private Context context = this;
+    private DongleService dongleService;
+    private boolean isBound = false;
 
-    public WifiManager wifiManager = null;
-    ControllerWifi wifiController = null;
-    ControllerAccessPoint accessPointController = null;
-    DongleAccessPoint wifiAccessPoint = null;
+    private WifiManager wifiManager = null;
+    private ControllerWifi wifiController = null;
+    private ControllerAccessPoint accessPointController = null;
+    private DongleAccessPoint dongleAccessPoint = null;
 
-//    DongleBroadcastReceiver dongleReceiver;
 
-    ServiceConnection serviceConnection;
+    private ServiceConnection serviceConnection;
     private void bindDongleService() {
 
         serviceConnection = new ServiceConnection() {
@@ -71,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
 //        decorView.setSystemUiVisibility(uiOptions);
         setContentView(R.layout.activity_main);
 
+        // TODO: remove, exist in StartBroadcastReceiver
+        Intent pushIntent = new Intent(context, DongleService.class);
+        context.startService(pushIntent);
+
         // add permission - android.permission.WAKE_LOCK
 //        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 //        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK|PowerManager.ON_AFTER_RELEASE, "server");
@@ -78,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
         wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         wifiController = new ControllerWifi(wifiManager);
-        accessPointController = new ControllerAccessPoint(wifiManager, wifiController);
+        accessPointController = new ControllerAccessPoint(wifiManager);
 
         // TODO: save wifi adapter state, access point state to shared preferences
         saveWifiAdapterState();
@@ -126,8 +129,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        wifiAccessPoint.destroyAccessPoint();
+        dongleAccessPoint.destroyAccessPoint();
         wifiController.turnOnOffWifi(this, false);
+        // TODO: check if work
+        stopService(new Intent(this, DongleService.class));
         this.finish();
         Log.d(TAG, "MainActivity.onDestroy()");
     }
@@ -146,17 +151,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Creating default Access Point
+     */
     private void initializeWifiAccessPoint (){
-        wifiAccessPoint = new DongleAccessPoint(this);
-        while(!wifiAccessPoint.createAccessPoint())
-        {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        dongleAccessPoint = new DongleAccessPoint(this);
+        dongleAccessPoint.createAccessPoint();
         Utils.toastShowBottom(this, "Default Access Point started");
+        Log.d(TAG, "MainActivity.initializeWifiAccessPoint() ");
     }
 
 }

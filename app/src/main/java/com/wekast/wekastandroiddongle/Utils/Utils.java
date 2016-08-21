@@ -34,10 +34,10 @@ public class Utils {
     public static final File DIRECTORY = new File(DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY);
 
     // SharedPreferences keys
-    // WIFI_STATE_BEFORE_LAUNCH_APP
-    // ACCESS_POINT_STATE_BEFORE_LAUNCH_APP
-    // ACCESS_POINT_SSID_ON_APP
-    // ACCESS_POINT_PASS_ON_APP
+    // WIFI_STATE_BEFORE_LAUNCH_APP             // save state of wifi module
+    // ACCESS_POINT_STATE_BEFORE_LAUNCH_APP     // save state of access point
+    // ACCESS_POINT_SSID_ON_APP         // loaded value when first time connected application to dongle
+    // ACCESS_POINT_PASS_ON_APP         // loaded value when first time connected application to dongle
 
 
     public static void initWorkFolder() {
