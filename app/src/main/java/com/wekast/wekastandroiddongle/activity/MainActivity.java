@@ -1,21 +1,30 @@
 package com.wekast.wekastandroiddongle.activity;
 
-import android.content.ComponentName;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.net.wifi.WifiManager;
-import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.wekast.wekastandroiddongle.R;
+import com.wekast.wekastandroiddongle.Utils.Loger;
 import com.wekast.wekastandroiddongle.controllers.ControllerAccessPoint;
 import com.wekast.wekastandroiddongle.controllers.ControllerWifi;
+import com.wekast.wekastandroiddongle.models.EZSFile;
 import com.wekast.wekastandroiddongle.services.DongleService;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.models.DongleAccessPoint;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 /**
  * Created by YEHUDA on 8/1/2016.
@@ -23,9 +32,10 @@ import com.wekast.wekastandroiddongle.models.DongleAccessPoint;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "wekastdongle";
+    private Loger log = Loger.getInstance();
     private Context context = this;
-    private DongleService dongleService;
-    private boolean isBound = false;
+//    private DongleService dongleService;
+//    private boolean isBound = false;
 
     private WifiManager wifiManager = null;
     private ControllerWifi wifiController = null;
@@ -33,26 +43,25 @@ public class MainActivity extends AppCompatActivity {
     private DongleAccessPoint dongleAccessPoint = null;
 
 
-    private ServiceConnection serviceConnection;
-    private void bindDongleService() {
-
-        serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                // cast the IBinder and get MyService instance
-                DongleService.MyBinder binder = (DongleService.MyBinder) service;
-                dongleService = binder.getService();
-                dongleService.setActivity(MainActivity.this);
-                isBound = true;
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                dongleService = null;
-                isBound = false;
-            }
-        };
-    }
+//    private ServiceConnection serviceConnection;
+//    private void bindDongleService() {
+//        serviceConnection = new ServiceConnection() {
+//            @Override
+//            public void onServiceConnected(ComponentName name, IBinder service) {
+//                // cast the IBinder and get MyService instance
+//                DongleService.MyBinder binder = (DongleService.MyBinder) service;
+//                dongleService = binder.getService();
+//                dongleService.setActivity(MainActivity.this);
+//                isBound = true;
+//            }
+//
+//            @Override
+//            public void onServiceDisconnected(ComponentName name) {
+//                dongleService = null;
+//                isBound = false;
+//            }
+//        };
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +79,6 @@ public class MainActivity extends AppCompatActivity {
 //        decorView.setSystemUiVisibility(uiOptions);
         setContentView(R.layout.activity_main);
 
-        // TODO: remove, exist in StartBroadcastReceiver
-        Intent pushIntent = new Intent(context, DongleService.class);
-        context.startService(pushIntent);
 
         // add permission - android.permission.WAKE_LOCK
 //        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -83,58 +89,146 @@ public class MainActivity extends AppCompatActivity {
         wifiController = new ControllerWifi(wifiManager);
         accessPointController = new ControllerAccessPoint(wifiManager);
 
+//        log.createLogger("Before setting application path");
+        log.setAppPath(context.getApplicationInfo().dataDir);
+
         // TODO: save wifi adapter state, access point state to shared preferences
         saveWifiAdapterState();
+
+        // without not started on dongle own access point at startup application
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // Create and start Access Point
         initializeWifiAccessPoint();
 
+        workWithZip();
+
         Log.d(TAG, "MainActivity.onCreate()");
+        log.createLogger("MainActivity.onCreate()");
+    }
+
+    private void workWithZip() {
+        EZSFile ezsFile = new EZSFile();
+        ZipFile zipFile = null;
+        File file = null;
+        try {
+
+            zipFile = new ZipFile("/sdcard/wekast/flip_split2.ezs");
+
+            ZipInputStream zipinputstream = null;
+            ZipEntry zipentry = null;
+            zipinputstream = new ZipInputStream(new FileInputStream("/sdcard/wekast/flip_split2.ezs"));
+
+            zipentry = zipinputstream.getNextEntry();
+
+            while (zipentry != null) {
+                //            int n;
+                //            FileOutputStream fileoutputstream;
+                //            File newFile = new File(destination, zipentry.getName());
+                File newFile = new File(zipentry.getName());
+                if (zipentry.isDirectory() && zipentry.getName().equals("animations")) {
+//                    newFile.mkdirs();
+                    zipentry = zipinputstream.getNextEntry();
+                    while (zipentry != null) {
+                        final InputStream zipStream = zipFile.getInputStream(zipentry);
+                        InputSupplier<InputStream> supplier = new InputSupplier<InputStream>() {
+                            InputStream getInput() {
+                                return zipStream;
+                            }
+                        };
+                        MediaStore.Files.copy(supplier, unzippedEntryFile);
+                    }
+                }
+                //
+                //            if (newFile.exists() && overwrite) {
+                //                log.info("Overwriting " + newFile);
+                //                newFile.delete();
+                //            }
+                //
+                //            fileoutputstream = new FileOutputStream(newFile);
+                //
+                //            while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
+                //                fileoutputstream.write(buf, 0, n);
+                //            }
+                //
+                //            fileoutputstream.close();
+                //            zipinputstream.closeEntry();
+                //            zipentry = zipinputstream.getNextEntry();
+            }
+            zipinputstream.close();
+        } catch (Exception e) {
+            throw new IllegalStateException("Can't unzip input stream", e);
+        }
     }
 
     @Override
     public void onStart() {
         super.onStart();
         Log.d(TAG, "MainActivity.onStart()");
+        log.createLogger("MainActivity.onStart()");
+
+        // TODO: remove, exist in StartBroadcastReceiver
+        Boolean isDongleServiceRunning = isServiceRunning();
+        if (!isDongleServiceRunning) {
+//            Intent pushIntent = new Intent(this, DongleService.class);
+            Intent pushIntent = new Intent(context, DongleService.class);
+            startService(pushIntent);
+        }
+        isDongleServiceRunning = isServiceRunning();
+        Log.d(TAG, "MainActivity.onCreate() Starting DongleService: " + isDongleServiceRunning);
+        log.createLogger("MainActivity.onCreate() Starting DongleService: " + isDongleServiceRunning);
+
 
         // Bind DongleService
-        Intent mIntent = new Intent(this, DongleService.class);
-        bindDongleService();
-        bindService(mIntent, serviceConnection, BIND_AUTO_CREATE);
+//        Intent mIntent = new Intent(this, DongleService.class);
+//        bindDongleService();
+//        bindService(mIntent, serviceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "MainActivity.onPause()");
+        log.createLogger("MainActivity.onPause()");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "MainActivity.onResume()");
+        log.createLogger("MainActivity.onResume()");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "MainActivity.onStop()");
+
+        stopService(new Intent(this, DongleService.class));
+
         // unbind DongleService
-        if (isBound) {
-            unbindService(serviceConnection);
-            isBound = false;
-        }
+//        if (isBound) {
+//            unbindService(serviceConnection);
+//            isBound = false;
+//        }
+        Log.d(TAG, "MainActivity.onStop()");
+        log.createLogger("MainActivity.onStop()");
     }
 
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
-        dongleAccessPoint.destroyAccessPoint();
-        wifiController.turnOnOffWifi(this, false);
+//        dongleAccessPoint.destroyAccessPoint();
+//        wifiController.turnOnOffWifi(this, false);
         // TODO: check if work
-        stopService(new Intent(this, DongleService.class));
-        this.finish();
+//        stopService(new Intent(this, DongleService.class));
+//        this.finish();
         Log.d(TAG, "MainActivity.onDestroy()");
+        log.createLogger("MainActivity.onDestroy()");
     }
 
     private void saveWifiAdapterState() {
@@ -152,13 +246,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Creating default Access Point
+     * Creating default
+     * Access Point
      */
     private void initializeWifiAccessPoint (){
         dongleAccessPoint = new DongleAccessPoint(this);
         dongleAccessPoint.createAccessPoint();
         Utils.toastShowBottom(this, "Default Access Point started");
         Log.d(TAG, "MainActivity.initializeWifiAccessPoint() ");
+        log.createLogger("MainActivity.initializeWifiAccessPoint()");
+    }
+
+    private boolean isServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+            if("com.wekast.wekastandroiddongle.services.DongleService".equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

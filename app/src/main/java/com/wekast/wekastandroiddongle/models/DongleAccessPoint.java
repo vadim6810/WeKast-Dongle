@@ -9,6 +9,7 @@ import android.provider.Settings;
 import android.util.Log;
 
 import com.wekast.wekastandroiddongle.R;
+import com.wekast.wekastandroiddongle.Utils.Loger;
 import com.wekast.wekastandroiddongle.controllers.ControllerAccessPoint;
 import com.wekast.wekastandroiddongle.controllers.ControllerWifi;
 
@@ -18,6 +19,7 @@ import com.wekast.wekastandroiddongle.controllers.ControllerWifi;
 public class DongleAccessPoint {
 
     private static final String TAG = "wekastdongle";
+    private Loger log = Loger.getInstance();
     private Context mainActivityContext = null;
     private Activity mainActivity = null;
     private WifiManager wifiManager = null;
@@ -47,18 +49,21 @@ public class DongleAccessPoint {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (Settings.System.canWrite(mainActivity)) {
                 Log.d(TAG, "MainActivity.startAccessPoint() Settings.System.canWrite(context)? true");
+                log.createLogger("MainActivity.startAccessPoint() Settings.System.canWrite(context)? true");
             } else {
                 Intent grantIntent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
                 mainActivity.startActivity(grantIntent);
                 Log.d(TAG, "MainActivity.startAccessPoint() Settings.System.canWrite(context)? false");
+                log.createLogger("MainActivity.startAccessPoint() Settings.System.canWrite(context)? false");
             }
         }
 
+        // Maybe not needed becouse on dongle on start wifi adapter is disabled
         // Turn off wifi before enabling Access Point
-        wifiController.turnOnOffWifi(mainActivity, false);
-        while (wifiController.isWifiOn(mainActivity)) {
-            wifiController.waitWhileWifiTurnOnOff(1000);
-        }
+//        wifiController.turnOnOffWifi(mainActivity, false);
+//        while (wifiController.isWifiOn(mainActivity)) {
+//            wifiController.waitWhileWifiTurnOnOff(1000);
+//        }
 
         // Turn on access point
         accessPointController.setAccessPointEnabled(mainActivity, true);

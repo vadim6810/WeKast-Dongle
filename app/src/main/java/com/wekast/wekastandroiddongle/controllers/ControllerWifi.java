@@ -7,12 +7,15 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import com.wekast.wekastandroiddongle.Utils.Loger;
+
 /**
  * Created by YEHUDA on 8/1/2016.
  */
 public class ControllerWifi {
 
     private static final String TAG = "wekastdongle";
+    private Loger log = Loger.getInstance();
     public WifiManager wifiManager;
     public WifiConfiguration wifiConfig;
 
@@ -29,6 +32,7 @@ public class ControllerWifi {
     public boolean isWifiOn(Context context) {
         boolean isWifiOn = wifiManager.isWifiEnabled();
         Log.d(TAG, "ControllerWifi.isWifiOn(): " + isWifiOn);
+        log.createLogger("ControllerWifi.isWifiOn(): " + isWifiOn);
         return isWifiOn;
     }
 
@@ -41,6 +45,7 @@ public class ControllerWifi {
     public void turnOnOffWifi(Context context, boolean b) {
         wifiManager.setWifiEnabled(b);
         Log.d(TAG, "ControllerWifi.turnOnOffWifi(): " + b);
+        log.createLogger("ControllerWifi.turnOnOffWifi(): " + b);
     }
 
     /**
@@ -71,6 +76,7 @@ public class ControllerWifi {
     public void disconnectFromWifi() {
         if (!wifiManager.disconnect()) {
             Log.d("TAG", "Failed to disconnect from network!");
+            log.createLogger("Failed to disconnect from network!");
         }
     }
 
@@ -83,6 +89,7 @@ public class ControllerWifi {
         int networkId = wifiManager.addNetwork(wifiConfig);
         if (networkId == -1) {
             Log.d("TAG", "Failed to add network configuration!");
+            log.createLogger("Failed to add network configuration!");
             return -1;
         }
         return networkId;
@@ -94,6 +101,7 @@ public class ControllerWifi {
     public void enableDisableWifiNetwork(int networkId, boolean b) {
         if (!wifiManager.enableNetwork(networkId, b)) {
             Log.d("TAG", "Failed to enable network!");
+            log.createLogger("Failed to enable network!");
         }
     }
 
@@ -103,6 +111,7 @@ public class ControllerWifi {
     public void reconnectToWifi() {
         if (!wifiManager.reconnect()) {
             Log.d("TAG", "Failed to connect!");
+            log.createLogger("Failed to connect!");
         }
     }
 
@@ -144,6 +153,7 @@ public class ControllerWifi {
         } catch (InterruptedException e) {
             e.printStackTrace();
             Log.d(TAG, "ControllerAccessPoint.waitWifi():  " + e);
+            log.createLogger("ControllerAccessPoint.waitWifi():  " + e);
         }
     }
 
@@ -153,6 +163,7 @@ public class ControllerWifi {
         } catch (InterruptedException e) {
             e.printStackTrace();
             Log.d(TAG, "ControllerAccessPoint.waitWifi():  " + e);
+            log.createLogger("ControllerAccessPoint.waitWifi():  " + e);
         }
     }
 

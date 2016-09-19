@@ -2,11 +2,10 @@ package com.wekast.wekastandroiddongle.services;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.wekast.wekastandroiddongle.R;
+import com.wekast.wekastandroiddongle.Utils.Loger;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.activity.MainActivity;
 import com.wekast.wekastandroiddongle.models.DongleWifi;
@@ -30,11 +29,12 @@ import java.net.Socket;
 public class DongleService extends Service {
 
     private static final String TAG = "wekastdongle";
+    private Loger log = Loger.getInstance();
     MainActivity activity;
     ServerSocket serverSocket;
     String message = "";
 
-    private IBinder myBinder = new MyBinder();
+//    private IBinder myBinder = new MyBinder();
 
     public void setActivity(MainActivity activity) {
         this.activity = activity;
@@ -44,32 +44,41 @@ public class DongleService extends Service {
         Thread socketServerThread = new Thread(new SocketDongleServerThread());
         socketServerThread.setName("DongleSocketServer");
         socketServerThread.start();
-        Log.d(TAG, "DongleService() - socketServerThread.getName(): " + socketServerThread.getName());
+        Log.d(TAG, "DongleService.DongleService() Starting: " + socketServerThread.getName());
+        log.createLogger("DongleService.DongleService() Starting: " + socketServerThread.getName());
     }
 
     @Override
     public void onCreate() {
+        Log.d(TAG, "DongleService.onCreate()");
+        log.createLogger("DongleService.onCreate()");
+    }
 
-        Log.d(TAG, "DongleService.onCreate() called");
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "DongleService.onDestroy()");
+        log.createLogger("DongleService.onDestroy()");
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
-        Log.d(TAG, "DongleService.onBind() done");
-        return myBinder;
+        Log.d(TAG, "DongleService.onBind()");
+        log.createLogger("DongleService.onBind()");
+//        return myBinder;
+        return null;
     }
 
-    @Override
-    public boolean onUnbind(Intent intent) {
-        return false;
-    }
-
-    public class MyBinder extends Binder {
-        public DongleService getService() {
-            return DongleService.this;
-        }
-    }
+//    @Override
+//    public boolean onUnbind(Intent intent) {
+//        return false;
+//    }
+//
+//    public class MyBinder extends Binder {
+//        public DongleService getService() {
+//            return DongleService.this;
+//        }
+//    }
 
 //    public void ping() {
 //        Log.d(TAG, "DongleService.ping() called");
@@ -88,16 +97,21 @@ public class DongleService extends Service {
 //    }
 
     public void saveAccessPointConfig(JSONObject jsonObject) throws JSONException {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Utils.toastShowBottom(activity, "Received wifi config from application. Connecting...");
-            }
-        });
+
+        final String newSsid = jsonObject.getString("ssid");
+        final String newPass = jsonObject.getString("pass");
+
 
         // Save received ssid and pass in shared preferences
         Utils.setFieldSP(activity, "ACCESS_POINT_SSID_ON_APP", jsonObject.getString("ssid"));
         Utils.setFieldSP(activity, "ACCESS_POINT_PASS_ON_APP", jsonObject.getString("pass"));
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Utils.toastShowBottom(activity, "Received wifi config from application. Connecting to " + newSsid + " " + newPass);
+            }
+        });
 
         // Connect to Access Point of application
         DongleWifi dongleWifi = new DongleWifi(activity);
@@ -111,12 +125,16 @@ public class DongleService extends Service {
         public void run() {
             InputStream inputStream = null;
             OutputStream outputStream = null;
+//            String socketServerPort = getText(R.string.socketServerPort).toString();
+            String socketServerPort = "8888";
+//            int socketServerPort = Integer.valueOf(getText(R.string.socketServerPort).toString());
+            Log.d(TAG, "DongleService.SocketDongleServerThread.run() socketServerPort: " + socketServerPort);
+            log.createLogger("DongleService.SocketDongleServerThread.run() socketServerPort: " + socketServerPort);
             try {
-                String socketServerPort = getText(R.string.socketServerPort).toString();
-                Log.d(TAG, "DongleService.SocketDongleServerThread socketServerPort: " + socketServerPort);
                 serverSocket = new ServerSocket(Integer.valueOf(socketServerPort));
+//                serverSocket = new ServerSocket(socketServerPort);
+                Socket socket = serverSocket.accept();
                 while (true) {
-                    Socket socket = serverSocket.accept();
                     count++;
                     String ipAPP = socket.getInetAddress().toString();
                     message += "#" + count + " from "
@@ -124,7 +142,7 @@ public class DongleService extends Service {
                             + socket.getPort() + "\n";
 
                     inputStream = socket.getInputStream();
-                    int isAvailable = inputStream.available();
+//                    int isAvailable = inputStream.available();
                     BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
                     String task = "";
                     String input = "";
@@ -156,7 +174,8 @@ public class DongleService extends Service {
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        Log.d(TAG, "DongleService.run(): " + e);
+                        Log.d(TAG, "DongleService.SocketDongleServerThread.run(): ERROR: " + e.getMessage());
+                        log.createLogger("DongleService.SocketDongleServerThread.run() ERROR: " + e.getMessage());
                     }
 
                     SocketDongleServerReplyThread socketServerReplyThread = new SocketDongleServerReplyThread(
@@ -164,20 +183,24 @@ public class DongleService extends Service {
                     socketServerReplyThread.setName("socketServerReplyThread");
                     socketServerReplyThread.run();
 
-                    Log.d(TAG, "socketServerReplyThread.getName(): " + socketServerReplyThread.getName());
+                    Log.d(TAG, "DongleService.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
+                    log.createLogger("DongleService.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                if (serverSocket != null) {
-                    try {
-                        serverSocket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Log.d(TAG, "DongleService: " + e);
-                    }
-                }
+                Log.d(TAG, "DongleService.SocketDongleServerThread.run(): ERROR: " + e.getMessage());
+                log.createLogger("DongleService.SocketDongleServerThread.run() ERROR: " + e.getMessage());
             }
+//            finally {
+//                if (serverSocket != null) {
+//                    try {
+//                        serverSocket.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        Log.d(TAG, "DongleService: " + e);
+//                    }
+//                }
+//            }
         }
     } // SocketDongleServerThread
 

@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.wekast.wekastandroiddongle.Utils.Loger;
 import com.wekast.wekastandroiddongle.controllers.ControllerAccessPoint;
 import com.wekast.wekastandroiddongle.controllers.ControllerWifi;
 import com.wekast.wekastandroiddongle.Utils.Utils;
@@ -20,6 +21,7 @@ import java.util.List;
 public class DongleWifi {
 
     private static final String TAG = "wekastdongle";
+    private Loger log = Loger.getInstance();
     private Context mainActivityContext = null;
     private Activity mainActivity = null;
     private WifiManager wifiManager = null;
@@ -53,6 +55,7 @@ public class DongleWifi {
 //        wifiController.waitWhileWifiTurnOnOff();
 
         Log.i(TAG, "DongleWifi.connectToAccessPoint() isWifiOn: " + wifiController.isWifiOn(mainActivityContext));
+        log.createLogger("DongleWifi.connectToAccessPoint() isWifiOn: " + wifiController.isWifiOn(mainActivityContext));
 
         // Remove wifi configuration with default dongle access point SSID if exists
         List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
@@ -75,6 +78,8 @@ public class DongleWifi {
                     wifiController.reconnectToWifi();
                     Log.d(TAG, "MainActivity.connectToWifiHotspot(): connected to "
                             + wifiController.wifiConfig.SSID + " with netId " + netId);
+                    log.createLogger("MainActivity.connectToWifiHotspot(): connected to "
+                            + wifiController.wifiConfig.SSID + " with netId " + netId);
                     break;
                 }
             }
@@ -84,6 +89,7 @@ public class DongleWifi {
         waitWifiConnect();
         showMessage("Connected to WiFi " + curSsid);
         Log.d(TAG, "AccessPointService.onHandleIntent(): end ");
+        log.createLogger("AccessPointService.onHandleIntent(): end ");
         return true;
     }
 
@@ -97,6 +103,7 @@ public class DongleWifi {
         long timeEnd = System.currentTimeMillis();
         double timeElapsed = 0;
         Log.i(TAG, "DongleWifi.connectToAccessPoint() isWifiOn: " + wifiController.isWifiOn(mainActivityContext));
+        log.createLogger("DongleWifi.connectToAccessPoint() isWifiOn: " + wifiController.isWifiOn(mainActivityContext));
 
         // Wait while wifi connecting
         while (!wifiController.isWifiConnected(mainActivity)) {
@@ -106,12 +113,14 @@ public class DongleWifi {
 
             // TODO: set to 180 ( 3 min )
             // If Dongle can't connect to Access Point on client, start one more time Dongle Access Point
-            if (timeElapsed > 30.0) {
+//            if (timeElapsed > 30.0) {
+            if (timeElapsed > 60.0) {
                 DongleAccessPoint dongleAccessPoint = new DongleAccessPoint(mainActivity);
                 dongleAccessPoint.createAccessPoint();
                 // java.lang.RuntimeException: Can't create handler inside thread that has not called Looper.prepare()
                 // Utils.toastShowBottom(mainActivityContext, "Default Access Point started");
                 Log.d(TAG, "DongleWifi.waitWifiConnect() ");
+                log.createLogger("DongleWifi.waitWifiConnect() ");
             }
         }
     }
