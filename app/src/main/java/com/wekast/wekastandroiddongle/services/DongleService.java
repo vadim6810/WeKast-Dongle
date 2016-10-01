@@ -2,6 +2,7 @@ package com.wekast.wekastandroiddongle.services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -24,15 +25,37 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
+ * Explanations
+ * For keeping activity created class DongleServiceBinder
+ *
  * Created by YEHUDA on 8/1/2016.
  */
 public class DongleService extends Service {
 
     private static final String TAG = "wekastdongle";
+    private static JSONObject response;
     private Loger log = Loger.getInstance();
     MainActivity activity;
     ServerSocket serverSocket;
-    String message = "";
+
+    // code for keeping activity in service
+    private final IBinder mBinder = new DongleServiceBinder();
+
+    public class DongleServiceBinder extends Binder {
+        public DongleService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return DongleService.this;
+        }
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        // TODO: Return the communication channel to the service.
+        Log.d(TAG, "DongleService.onBind()");
+        log.createLogger("DongleService.onBind()");
+        return mBinder;
+    }
+    // end code for keeping activity in service
 
 //    private IBinder myBinder = new MyBinder();
 
@@ -41,6 +64,7 @@ public class DongleService extends Service {
     }
 
     public DongleService() {
+        response = Utils.createJsonResponse("response", "ok");
         Thread socketServerThread = new Thread(new SocketDongleServerThread());
         socketServerThread.setName("DongleSocketServer");
         socketServerThread.start();
@@ -60,14 +84,7 @@ public class DongleService extends Service {
         log.createLogger("DongleService.onDestroy()");
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        Log.d(TAG, "DongleService.onBind()");
-        log.createLogger("DongleService.onBind()");
-//        return myBinder;
-        return null;
-    }
+
 
 //    @Override
 //    public boolean onUnbind(Intent intent) {
@@ -96,35 +113,14 @@ public class DongleService extends Service {
 //        Log.d(TAG, "DongleService.show(" + slideNumber + ") called");
 //    }
 
-    public void saveAccessPointConfig(JSONObject jsonObject) throws JSONException {
 
-        final String newSsid = jsonObject.getString("ssid");
-        final String newPass = jsonObject.getString("pass");
-
-
-        // Save received ssid and pass in shared preferences
-        Utils.setFieldSP(activity, "ACCESS_POINT_SSID_ON_APP", jsonObject.getString("ssid"));
-        Utils.setFieldSP(activity, "ACCESS_POINT_PASS_ON_APP", jsonObject.getString("pass"));
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Utils.toastShowBottom(activity, "Received wifi config from application. Connecting to " + newSsid + " " + newPass);
-            }
-        });
-
-        // Connect to Access Point of application
-        DongleWifi dongleWifi = new DongleWifi(activity);
-        dongleWifi.connectToAccessPoint();
-    }
 
     private class SocketDongleServerThread extends Thread {
-        int count = 0;
 
         @Override
         public void run() {
             InputStream inputStream = null;
-            OutputStream outputStream = null;
+//            OutputStream outputStream = null;
 //            String socketServerPort = getText(R.string.socketServerPort).toString();
             String socketServerPort = "8888";
 //            int socketServerPort = Integer.valueOf(getText(R.string.socketServerPort).toString());
@@ -132,59 +128,68 @@ public class DongleService extends Service {
             log.createLogger("DongleService.SocketDongleServerThread.run() socketServerPort: " + socketServerPort);
             try {
                 serverSocket = new ServerSocket(Integer.valueOf(socketServerPort));
-//                serverSocket = new ServerSocket(socketServerPort);
-                Socket socket = serverSocket.accept();
+
                 while (true) {
-                    count++;
-                    String ipAPP = socket.getInetAddress().toString();
-                    message += "#" + count + " from "
-                            + ipAPP + ":"
-                            + socket.getPort() + "\n";
+                    Socket socket = serverSocket.accept();
 
-                    inputStream = socket.getInputStream();
+                    // TODO: comment after debug
+                    printMessageOnUi("Client connected");
+
+                    Log.d(TAG, "DongleService.SocketDongleServerThread.run(): socket is connected? " + socket.isConnected());
+                    log.createLogger("DongleService.SocketDongleServerThread.run() socket is connected? " + socket.isConnected());
+
+                    while (true) {
+                        try {
+                            inputStream = socket.getInputStream();
+                        } catch (IOException e) {
+                            break;
+                        }
+
 //                    int isAvailable = inputStream.available();
-                    BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-                    String task = "";
-                    String input = "";
-                    while((input = br.readLine())!= null) {
-                        task += input;
-                    }
+                        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                        String task = null;
+                        task = br.readLine();
 
-                    JSONObject  jsonRootObject = null;
-                    JSONArray jsonTask = null;
-                    String curDevice = "";
-                    try {
-                        jsonRootObject = new JSONObject(task);
-                        curDevice = jsonRootObject.getString("device");
-                        if (curDevice.equals("android")) {
-                            jsonTask = jsonRootObject.optJSONArray("task");
-                            for(int i=0; i < jsonTask.length(); i++){
-                                JSONObject jsonObject = jsonTask.getJSONObject(i);
-                                String curCommmand = jsonObject.getString("command").toString();
-                                if (curCommmand.equals("show")) {
-                                    int slide = jsonObject.getInt("slide");
-                                    // show(slide);
-                                }
-                                if (curCommmand.equals("accessPointConfig")) {
-                                    saveAccessPointConfig(jsonObject);
+                        // TODO: comment after debug
+                        printMessageOnUi(task);
+
+                        JSONObject jsonRootObject = null;
+                        JSONArray jsonTask = null;
+                        String curDevice = "";
+                        try {
+                            jsonRootObject = new JSONObject(task);
+                            curDevice = jsonRootObject.getString("device");
+                            if (curDevice.equals("android")) {
+                                jsonTask = jsonRootObject.optJSONArray("task");
+                                for (int i = 0; i < jsonTask.length(); i++) {
+                                    JSONObject jsonObject = jsonTask.getJSONObject(i);
+                                    String curCommmand = jsonObject.getString("command").toString();
+                                    if (curCommmand.equals("show")) {
+                                        int slide = jsonObject.getInt("slide");
+                                        // show(slide);
+                                    }
+                                    if (curCommmand.equals("accessPointConfig")) {
+                                        saveAccessPointConfig(jsonObject);
+                                    }
                                 }
                             }
+                            if (curDevice.equals("ios")) {
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.d(TAG, "DongleService.SocketDongleServerThread.run(): ERROR: " + e.getMessage());
+                            log.createLogger("DongleService.SocketDongleServerThread.run() ERROR: " + e.getMessage());
                         }
-                        if (curDevice.equals("ios")) {
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Log.d(TAG, "DongleService.SocketDongleServerThread.run(): ERROR: " + e.getMessage());
-                        log.createLogger("DongleService.SocketDongleServerThread.run() ERROR: " + e.getMessage());
+
+
+                        SocketDongleServerReplyThread socketServerReplyThread = new SocketDongleServerReplyThread(
+                                socket, response);
+                        socketServerReplyThread.setName("socketServerReplyThread");
+                        socketServerReplyThread.run();
+
+                        Log.d(TAG, "DongleService.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
+                        log.createLogger("DongleService.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
                     }
-
-                    SocketDongleServerReplyThread socketServerReplyThread = new SocketDongleServerReplyThread(
-                            socket, count);
-                    socketServerReplyThread.setName("socketServerReplyThread");
-                    socketServerReplyThread.run();
-
-                    Log.d(TAG, "DongleService.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
-                    log.createLogger("DongleService.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -206,28 +211,58 @@ public class DongleService extends Service {
 
     private class SocketDongleServerReplyThread extends Thread {
         private Socket hostThreadSocket;
-        int cnt;
+        JSONObject response;
 
-        SocketDongleServerReplyThread(Socket socket, int cnt) {
+        SocketDongleServerReplyThread(Socket socket, JSONObject response) {
             hostThreadSocket = socket;
-            this.cnt = cnt;
+            this.response = response;
         }
 
         @Override
         public void run() {
             OutputStream outputStream;
-            String msgReply = "Response from Dongle" + cnt;
             try {
                 outputStream = hostThreadSocket.getOutputStream();
                 PrintStream printStream = new PrintStream(outputStream);
-                printStream.print(msgReply);
+                printStream.print(response);
                 printStream.close();
                 outputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                message += "Something wrong! " + e.toString() + "\n";
+                Log.d(TAG, "DongleService.SocketDongleServerReplyThread.run() IOException " + e.getMessage());
+                log.createLogger("DongleService.SocketDongleServerReplyThread.run() IOException " + e.getMessage());
             }
         }
+    }
+
+    public void saveAccessPointConfig(JSONObject jsonObject) throws JSONException {
+        final String newSsid = jsonObject.getString("ssid");
+        final String newPass = jsonObject.getString("pass");
+
+        // Save received ssid and pass in shared preferences
+        Utils.setFieldSP(activity, "ACCESS_POINT_SSID_ON_APP", jsonObject.getString("ssid"));
+        Utils.setFieldSP(activity, "ACCESS_POINT_PASS_ON_APP", jsonObject.getString("pass"));
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Utils.toastShowBottom(activity, "Received wifi config from application. Connecting to " + newSsid + " " + newPass);
+            }
+        });
+
+        // Connect to Access Point of application
+        DongleWifi dongleWifi = new DongleWifi(activity);
+        dongleWifi.connectToAccessPoint();
+    }
+
+    public void printMessageOnUi(String message) {
+        final String curMessage = message;
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Utils.toastShowBottom(activity, curMessage);
+            }
+        });
     }
 
 }

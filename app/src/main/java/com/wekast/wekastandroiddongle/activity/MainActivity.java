@@ -1,10 +1,12 @@
 package com.wekast.wekastandroiddongle.activity;
 
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.wifi.WifiManager;
-import android.provider.MediaStore;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,20 +15,14 @@ import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Loger;
 import com.wekast.wekastandroiddongle.controllers.ControllerAccessPoint;
 import com.wekast.wekastandroiddongle.controllers.ControllerWifi;
-import com.wekast.wekastandroiddongle.models.EZSFile;
 import com.wekast.wekastandroiddongle.services.DongleService;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.models.DongleAccessPoint;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-
 /**
+ * Explanations
+ *
+ *
  * Created by YEHUDA on 8/1/2016.
  */
 public class MainActivity extends AppCompatActivity {
@@ -34,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "wekastdongle";
     private Loger log = Loger.getInstance();
     private Context context = this;
-//    private DongleService dongleService;
-//    private boolean isBound = false;
+    private DongleService dongleService ;
+    private boolean isBound = false;
 
     private WifiManager wifiManager = null;
     private ControllerWifi wifiController = null;
@@ -63,6 +59,25 @@ public class MainActivity extends AppCompatActivity {
 //        };
 //    }
 
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to DongleService, cast the IBinder and get DongleService instance
+            DongleService.DongleServiceBinder binder = (DongleService.DongleServiceBinder) service;
+            dongleService = binder.getService();
+            dongleService.setActivity(MainActivity.this);
+            isBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            isBound = false;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Hide the status bar
@@ -73,10 +88,14 @@ public class MainActivity extends AppCompatActivity {
         // hide action bar
         getSupportActionBar().hide();
 //        requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        ///////////////////////////////////////////////////////////////
+//        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        View decorView = getWindow().getDecorView();
 //        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_FULLSCREEN;
 //        decorView.setSystemUiVisibility(uiOptions);
+        ///////////////////////////////////////////////////////////////
+
         setContentView(R.layout.activity_main);
 
 
@@ -88,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
         wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
         wifiController = new ControllerWifi(wifiManager);
         accessPointController = new ControllerAccessPoint(wifiManager);
+
+
 
 //        log.createLogger("Before setting application path");
         log.setAppPath(context.getApplicationInfo().dataDir);
@@ -105,13 +126,13 @@ public class MainActivity extends AppCompatActivity {
         // Create and start Access Point
         initializeWifiAccessPoint();
 
-        workWithZip();
+//        workWithZip();
 
         Log.d(TAG, "MainActivity.onCreate()");
         log.createLogger("MainActivity.onCreate()");
     }
 
-    private void workWithZip() {
+    /*private void workWithZip() {
         EZSFile ezsFile = new EZSFile();
         ZipFile zipFile = null;
         File file = null;
@@ -163,11 +184,16 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             throw new IllegalStateException("Can't unzip input stream", e);
         }
-    }
+    }*/
 
     @Override
     public void onStart() {
         super.onStart();
+
+        // Bind to DongleService
+        Intent intent = new Intent(this, DongleService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
         Log.d(TAG, "MainActivity.onStart()");
         log.createLogger("MainActivity.onStart()");
 
@@ -208,6 +234,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
 
         stopService(new Intent(this, DongleService.class));
+
+        // Unbind from the DongleService
+        if (isBound) {
+            unbindService(mConnection);
+            isBound = false;
+        }
 
         // unbind DongleService
 //        if (isBound) {

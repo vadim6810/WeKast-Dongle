@@ -119,4 +119,20 @@ public class Utils {
         return arrayList;
     }
 
+    public static JSONObject createJsonResponse(String task, String status) {
+        // TODO: create rundom ssid and pass
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonTask = new JSONArray();
+        JSONObject jsonCommand = new JSONObject();
+        try {
+            jsonCommand.put("command", task);
+            jsonCommand.put("status", status);
+            jsonTask.put(jsonCommand);
+            jsonObject.put("device", "dongle");
+            jsonObject.put("task", jsonTask);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
 }
