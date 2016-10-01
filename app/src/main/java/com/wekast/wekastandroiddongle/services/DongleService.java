@@ -236,19 +236,24 @@ public class DongleService extends Service {
     }
 
     public void saveAccessPointConfig(JSONObject jsonObject) throws JSONException {
-        final String newSsid = jsonObject.getString("ssid");
-        final String newPass = jsonObject.getString("pass");
+        String newSsid = jsonObject.getString("ssid");
+        String newPass = jsonObject.getString("pass");
+//        final String newSsid = jsonObject.getString("ssid");
+//        final String newPass = jsonObject.getString("pass");
 
         // Save received ssid and pass in shared preferences
-        Utils.setFieldSP(activity, "ACCESS_POINT_SSID_ON_APP", jsonObject.getString("ssid"));
-        Utils.setFieldSP(activity, "ACCESS_POINT_PASS_ON_APP", jsonObject.getString("pass"));
+        Utils.setFieldSP(activity, "ACCESS_POINT_SSID_ON_APP", newSsid);
+        Utils.setFieldSP(activity, "ACCESS_POINT_PASS_ON_APP", newPass);
+//        Utils.setFieldSP(activity, "ACCESS_POINT_SSID_ON_APP", jsonObject.getString("ssid"));
+//        Utils.setFieldSP(activity, "ACCESS_POINT_PASS_ON_APP", jsonObject.getString("pass"));
 
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Utils.toastShowBottom(activity, "Received wifi config from application. Connecting to " + newSsid + " " + newPass);
-            }
-        });
+        printMessageOnUi("Connecting to " + newSsid + " " + newPass);
+//        activity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Utils.toastShowBottom(activity, "Received wifi config from application. Connecting to " + newSsid + " " + newPass);
+//            }
+//        });
 
         // Connect to Access Point of application
         DongleWifi dongleWifi = new DongleWifi(activity);
