@@ -86,7 +86,7 @@ public class DongleWifi {
         }
 
         // Wait while wifi establish connection
-        waitWifiConnect();
+       // waitWifiConnect();
         showMessage("Connected to WiFi " + curSsid);
         Log.d(TAG, "AccessPointService.onHandleIntent(): end ");
         log.createLogger("AccessPointService.onHandleIntent(): end ");

@@ -173,10 +173,11 @@ public class DongleService extends Service {
                                         // show(slide);
                                     }
                                     if (curCommmand.equals("accessPointConfig")) {
+                                        //sendResponse(socket);
                                         saveAccessPointConfig(jsonObject);
                                     }
                                     if (curCommmand.equals("uploadFile")) {
-                                        sendResponse(socket);
+                                        //sendResponse(socket);
                                         task = br.readLine();
                                         printMessageOnUi("RECEIVED:" + task);
                                         int j = 0;
@@ -199,16 +200,17 @@ public class DongleService extends Service {
                 Log.d(TAG, "DongleService.SocketDongleServerThread.run(): ERROR: " + e.getMessage());
                 log.createLogger("DongleService.SocketDongleServerThread.run() ERROR: " + e.getMessage());
             }
-//            finally {
-//                if (serverSocket != null) {
-//                    try {
+            finally {
+
+                    try {
+                        if (inputStream != null) inputStream.close();
 //                        serverSocket.close();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                        Log.d(TAG, "DongleService: " + e);
-//                    }
-//                }
-//            }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Log.d(TAG, "DongleService: " + e);
+                    }
+
+            }
         }
     } // SocketDongleServerThread
 
@@ -249,24 +251,24 @@ public class DongleService extends Service {
                 PrintWriter printWriter = new PrintWriter(outputStream, true);
                 printWriter.println(response);
 
+                Utils.setFieldSP(activity, "DONGLE_SERVICE_RESPONSE_SENDED", "1");
+
                 // TODO: comment after debug
                 printMessageOnUi("SENDED:" + response);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.d(TAG, "DongleService.SocketDongleServerReplyThread.run() IOException " + e.getMessage());
                 log.createLogger("DongleService.SocketDongleServerReplyThread.run() IOException " + e.getMessage());
-            } finally {
+            }
+            finally {
                 try {
-                    if (outputStream != null)  {
-                        outputStream.close();
-                    }
-                    if (hostThreadSocket != null) {
-                        hostThreadSocket.close();
-                    }
+                    if (outputStream != null) outputStream.close();
+//                    if (hostThreadSocket != null) {
+//                        hostThreadSocket.close();
+//                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
         }
     }
@@ -291,10 +293,32 @@ public class DongleService extends Service {
 //            }
 //        });
 
+        waitWhileDongleServiceResponseSended();
+
         // Connect to Access Point of application
-//        printMessageOnUi("Connecting to " + newSsid + " " + newPass);
-//        DongleWifi dongleWifi = new DongleWifi(activity);
-//        dongleWifi.connectToAccessPoint();
+        printMessageOnUi("Connecting to " + newSsid + " " + newPass);
+        DongleWifi dongleWifi = new DongleWifi(activity);
+        dongleWifi.connectToAccessPoint();
+    }
+
+    private void waitWhileDongleServiceResponseSended() {
+        String isResponseSended = "";
+        boolean sended = false;
+        while(!sended) {
+            isResponseSended = Utils.getFieldSP(activity, "DONGLE_SERVICE_RESPONSE_SENDED");
+            if (isResponseSended.equals("1")) {
+                sended = true;
+                Utils.setFieldSP(activity, "DONGLE_SERVICE_RESPONSE_SENDED", "0");
+            } else {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "DongleService.waitWhileDongleServiceResponseSended() " + e.getMessage());
+                }
+            }
+        }
+
     }
 
     public void printMessageOnUi(String message) {
