@@ -268,6 +268,8 @@ public class MainActivity extends AppCompatActivity {
         Boolean isWifiEnabled = wifiController.isWifiOn(MainActivity.this);
         // TODO: save access point state to isAccessPointEnabled
         if(isWifiEnabled) {
+            // disable wifi
+            wifiController.turnOnOffWifi(context, false);
             Utils.setFieldSP(MainActivity.this, "WIFI_STATE_BEFORE_LAUNCH_APP", isWifiEnabled.toString());
             Utils.setFieldSP(MainActivity.this, "ACCESS_POINT_STATE_BEFORE_LAUNCH_APP", "false");
             // TODO: save connected wifi ssid

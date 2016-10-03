@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -31,7 +30,7 @@ import java.net.Socket;
  *
  * Created by YEHUDA on 8/1/2016.
  */
-public class DongleService extends Service {
+public class DongleServiceEZS extends Service {
 
     private static final String TAG = "wekastdongle";
     private static JSONObject jsonResponse;
@@ -43,9 +42,9 @@ public class DongleService extends Service {
     private final IBinder mBinder = new DongleServiceBinder();
 
     public class DongleServiceBinder extends Binder {
-        public DongleService getService() {
+        public DongleServiceEZS getService() {
             // Return this instance of LocalService so clients can call public methods
-            return DongleService.this;
+            return DongleServiceEZS.this;
         }
     }
 
@@ -64,7 +63,7 @@ public class DongleService extends Service {
         this.activity = activity;
     }
 
-    public DongleService() {
+    public DongleServiceEZS() {
         jsonResponse = Utils.createJsonResponse("jsonResponse", "ok");
         Thread socketServerThread = new Thread(new SocketDongleServerThread());
         socketServerThread.setName("DongleSocketServer");
@@ -175,12 +174,6 @@ public class DongleService extends Service {
                                     if (curCommmand.equals("accessPointConfig")) {
                                         saveAccessPointConfig(jsonObject);
                                     }
-                                    if (curCommmand.equals("uploadFile")) {
-                                        sendResponse(socket);
-                                        task = br.readLine();
-                                        printMessageOnUi("RECEIVED:" + task);
-                                        int j = 0;
-                                    }
                                 }
                             }
                             if (curDevice.equals("ios")) {
@@ -191,7 +184,14 @@ public class DongleService extends Service {
                             log.createLogger("DongleService.SocketDongleServerThread.run() ERROR: " + e.getMessage());
                         }
 
-                        sendResponse(socket);
+
+                        SocketDongleServerReplyThread socketServerReplyThread = new SocketDongleServerReplyThread(
+                                socket, jsonResponse);
+                        socketServerReplyThread.setName("socketServerReplyThread");
+                        socketServerReplyThread.run();
+
+                        Log.d(TAG, "DongleService.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
+                        log.createLogger("DongleService.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
                     }
                 }
             } catch (IOException e) {
@@ -212,16 +212,6 @@ public class DongleService extends Service {
         }
     } // SocketDongleServerThread
 
-
-    private void sendResponse(Socket socket) {
-        SocketDongleServerReplyThread socketServerReplyThread = new SocketDongleServerReplyThread(
-                socket, jsonResponse);
-        socketServerReplyThread.setName("socketServerReplyThread");
-        socketServerReplyThread.run();
-        Log.d(TAG, "DongleService.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
-        log.createLogger("DongleService.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
-    }
-
     private class SocketDongleServerReplyThread extends Thread {
         private Socket hostThreadSocket;
         JSONObject response;
@@ -233,40 +223,20 @@ public class DongleService extends Service {
 
         @Override
         public void run() {
-            OutputStream outputStream = null;
+            OutputStream outputStream;
             try {
                 outputStream = hostThreadSocket.getOutputStream();
-//                PrintStream printStream = new PrintStream(outputStream);
-//                printStream.print(response);
-//                printStream.flush();
-//                printStream.close();
-//                outputStream.close();
-//                PrintWriter printWriter = new PrintWriter(outputStream, true);
-//                printWriter.print(response);
-//                printWriter.close();
-//                outputStream.close();
-
-                PrintWriter printWriter = new PrintWriter(outputStream, true);
-                printWriter.println(response);
-
+                PrintStream printStream = new PrintStream(outputStream);
+                printStream.print(response);
+                printStream.flush();
+                printStream.close();
+                outputStream.close();
                 // TODO: comment after debug
                 printMessageOnUi("SENDED:" + response);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.d(TAG, "DongleService.SocketDongleServerReplyThread.run() IOException " + e.getMessage());
                 log.createLogger("DongleService.SocketDongleServerReplyThread.run() IOException " + e.getMessage());
-            } finally {
-                try {
-                    if (outputStream != null)  {
-                        outputStream.close();
-                    }
-                    if (hostThreadSocket != null) {
-                        hostThreadSocket.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
             }
         }
     }
@@ -283,7 +253,7 @@ public class DongleService extends Service {
 //        Utils.setFieldSP(activity, "ACCESS_POINT_SSID_ON_APP", jsonObject.getString("ssid"));
 //        Utils.setFieldSP(activity, "ACCESS_POINT_PASS_ON_APP", jsonObject.getString("pass"));
 
-
+        printMessageOnUi("Connecting to " + newSsid + " " + newPass);
 //        activity.runOnUiThread(new Runnable() {
 //            @Override
 //            public void run() {
@@ -292,9 +262,8 @@ public class DongleService extends Service {
 //        });
 
         // Connect to Access Point of application
-//        printMessageOnUi("Connecting to " + newSsid + " " + newPass);
-//        DongleWifi dongleWifi = new DongleWifi(activity);
-//        dongleWifi.connectToAccessPoint();
+        DongleWifi dongleWifi = new DongleWifi(activity);
+        dongleWifi.connectToAccessPoint();
     }
 
     public void printMessageOnUi(String message) {
