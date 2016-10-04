@@ -11,11 +11,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Created by Meztiros on 01.08.2016.
@@ -31,7 +35,9 @@ public class Utils {
     public static final String SHAREDPREFERNCE = "WeKastPreference";
     public static final String DEFAULT_PATH_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath() + "/";
     public static final String WORK_DIRECTORY = "WeKast/";
+    public static final String CASH_DIRECTORY = "Cash/";
     public static final File DIRECTORY = new File(DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY);
+    public static final String CASH_ABSOLUTE_PATH = DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY + CASH_DIRECTORY;
 
     // SharedPreferences keys
     // WIFI_STATE_BEFORE_LAUNCH_APP             // save state of wifi module
@@ -72,7 +78,8 @@ public class Utils {
     }
 
     public static void toastShowBottom(Context context, String s) {
-        Toast toast = Toast.makeText(context, s, Toast.LENGTH_LONG);
+//        Toast toast = Toast.makeText(context, s, Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(context, s, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER|Gravity.BOTTOM, 0, 0);
         toast.show();
     }
@@ -117,6 +124,36 @@ public class Utils {
             toastShow(context, e.toString());
         }
         return arrayList;
+    }
+
+    public static boolean unZipPresentation(String path) {
+        boolean res = false;
+        try {
+            ZipInputStream zin = new ZipInputStream(new FileInputStream(path));
+            ZipEntry zipEntry = null;
+            File targetDirectory = new File(CASH_ABSOLUTE_PATH);
+            while ((zipEntry = zin.getNextEntry()) != null) {
+                String filePath = targetDirectory + File.separator + zipEntry.getName();
+                if (!zipEntry.isDirectory()) {
+                    extractFile(zin, filePath, (int) zipEntry.getSize());
+                }
+                zin.closeEntry();
+            }
+            res = true;
+        } catch (Exception e) {
+            Log.d("UnzipError = ", e.toString());
+        }
+        return res;
+    }
+
+    private static void extractFile(ZipInputStream zipIn, String filePath, int size) throws IOException {
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+        byte[] bytesIn = new byte[size];
+        int read = 0;
+        while ((read = zipIn.read(bytesIn)) != -1) {
+            bos.write(bytesIn, 0, read);
+        }
+        bos.close();
     }
 
     public static JSONObject createJsonResponse(String task, String status) {

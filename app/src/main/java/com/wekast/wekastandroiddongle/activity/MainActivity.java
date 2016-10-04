@@ -5,11 +5,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Loger;
@@ -213,6 +216,13 @@ public class MainActivity extends AppCompatActivity {
 //        Intent mIntent = new Intent(this, DongleService.class);
 //        bindDongleService();
 //        bindService(mIntent, serviceConnection, BIND_AUTO_CREATE);
+
+
+        // test for changing image on image view WORK
+//        Bitmap bmp = BitmapFactory.decodeFile("/storage/sdcard0/WeKast/cash/slides/1.jpg");
+//        ImageView img = (ImageView) findViewById(R.id.mainIMG);
+//        img.setImageBitmap(bmp);
+
     }
 
     @Override
