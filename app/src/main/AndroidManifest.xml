@@ -19,19 +19,20 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.MainActivity"
-            android:windowSoftInputMode="stateHidden"
+            android:name=".activity.FullscreenActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape"
-            android:launchMode="singleTask">
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.HOME" />
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <receiver android:name=".services.StartBroadcastReceiver"
+        <receiver
+            android:name=".services.StartBroadcastReceiver"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -41,15 +42,29 @@
         <service android:name=".services.DongleService" />
         <!-- service android:name="com.wekast.wekastandroiddongle.services.AccessPointService" / -->
 
-        <!--receiver
+
+        <!--
+        receiver
             android:name=".services.SDCardReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_MOUNTED" />
             </intent-filter>
-        </receiver-->
+        </receiver
+        -->
 
+        <!--<activity-->
+            <!--android:name=".activity.FullscreenActivity"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
+            <!--android:label="@string/title_activity_fullscreen"-->
+            <!--android:theme="@style/FullscreenTheme">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
+
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
+        <!--</activity>-->
     </application>
 
 </manifest>

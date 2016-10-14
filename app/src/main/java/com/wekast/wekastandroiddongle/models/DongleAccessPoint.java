@@ -10,8 +10,8 @@ import android.util.Log;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Loger;
-import com.wekast.wekastandroiddongle.controllers.ControllerAccessPoint;
-import com.wekast.wekastandroiddongle.controllers.ControllerWifi;
+import com.wekast.wekastandroiddongle.wifiControllers.ControllerAccessPoint;
+import com.wekast.wekastandroiddongle.wifiControllers.ControllerWifi;
 
 /**
  * Created by ELAD on 8/20/2016.

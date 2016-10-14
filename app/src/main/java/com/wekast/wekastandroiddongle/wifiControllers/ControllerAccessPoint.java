@@ -1,4 +1,4 @@
-package com.wekast.wekastandroiddongle.controllers;
+package com.wekast.wekastandroiddongle.wifiControllers;
 
 
 import android.content.Context;
@@ -76,6 +76,8 @@ public class ControllerAccessPoint {
 
     /**
      * Function that configuretes WifiConfiguration for connecting to hotspot
+     *
+     * TODO: make private? read config from XML
      *
      * @return configured WifiConfiguration
      */

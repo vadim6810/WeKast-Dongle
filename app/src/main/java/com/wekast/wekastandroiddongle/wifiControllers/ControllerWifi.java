@@ -1,4 +1,4 @@
-package com.wekast.wekastandroiddongle.controllers;
+package com.wekast.wekastandroiddongle.wifiControllers;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

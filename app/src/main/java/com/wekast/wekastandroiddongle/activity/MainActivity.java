@@ -5,19 +5,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ImageView;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Loger;
-import com.wekast.wekastandroiddongle.controllers.ControllerAccessPoint;
-import com.wekast.wekastandroiddongle.controllers.ControllerWifi;
+import com.wekast.wekastandroiddongle.wifiControllers.ControllerAccessPoint;
+import com.wekast.wekastandroiddongle.wifiControllers.ControllerWifi;
 import com.wekast.wekastandroiddongle.services.DongleService;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.models.DongleAccessPoint;
@@ -108,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
 //        wakeLock.acquire();
 
         wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+        // TODO: try to pass Context to constructor
         wifiController = new ControllerWifi(wifiManager);
         accessPointController = new ControllerAccessPoint(wifiManager);
 
@@ -117,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         log.setAppPath(context.getApplicationInfo().dataDir);
 
         // TODO: save wifi adapter state, access point state to shared preferences
-        saveWifiAdapterState();
+//        saveWifiAdapterState();
 
         // without not started on dongle own access point at startup application
         try {
