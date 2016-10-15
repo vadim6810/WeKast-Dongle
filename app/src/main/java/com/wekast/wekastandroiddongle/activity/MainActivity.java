@@ -13,9 +13,9 @@ import android.util.Log;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Loger;
+import com.wekast.wekastandroiddongle.services.DongleServiceOld;
 import com.wekast.wekastandroiddongle.wifiControllers.ControllerAccessPoint;
 import com.wekast.wekastandroiddongle.wifiControllers.ControllerWifi;
-import com.wekast.wekastandroiddongle.services.DongleService;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.models.DongleAccessPoint;
 
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "wekastdongle";
     private Loger log = Loger.getInstance();
     private Context context = this;
-    private DongleService dongleService ;
+    private DongleServiceOld dongleService ;
     private boolean isBound = false;
 
     private WifiManager wifiManager = null;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 //            @Override
 //            public void onServiceConnected(ComponentName name, IBinder service) {
 //                // cast the IBinder and get MyService instance
-//                DongleService.MyBinder binder = (DongleService.MyBinder) service;
+//                DongleServiceOld.MyBinder binder = (DongleServiceOld.MyBinder) service;
 //                dongleService = binder.getService();
 //                dongleService.setActivity(MainActivity.this);
 //                isBound = true;
@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
-            // We've bound to DongleService, cast the IBinder and get DongleService instance
-            DongleService.DongleServiceBinder binder = (DongleService.DongleServiceBinder) service;
+            // We've bound to DongleServiceOld, cast the IBinder and get DongleServiceOld instance
+            DongleServiceOld.DongleServiceBinder binder = (DongleServiceOld.DongleServiceBinder) service;
             dongleService = binder.getService();
             dongleService.setActivity(MainActivity.this);
             isBound = true;
@@ -191,8 +191,8 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        // Bind to DongleService
-        Intent intent = new Intent(this, DongleService.class);
+        // Bind to DongleServiceOld
+        Intent intent = new Intent(this, DongleServiceOld.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         Log.d(TAG, "MainActivity.onStart()");
@@ -201,17 +201,17 @@ public class MainActivity extends AppCompatActivity {
         // TODO: remove, exist in StartBroadcastReceiver
         Boolean isDongleServiceRunning = isServiceRunning();
         if (!isDongleServiceRunning) {
-//            Intent pushIntent = new Intent(this, DongleService.class);
-            Intent pushIntent = new Intent(context, DongleService.class);
+//            Intent pushIntent = new Intent(this, DongleServiceOld.class);
+            Intent pushIntent = new Intent(context, DongleServiceOld.class);
             startService(pushIntent);
         }
         isDongleServiceRunning = isServiceRunning();
-        Log.d(TAG, "MainActivity.onCreate() Starting DongleService: " + isDongleServiceRunning);
-        log.createLogger("MainActivity.onCreate() Starting DongleService: " + isDongleServiceRunning);
+        Log.d(TAG, "MainActivity.onCreate() Starting DongleServiceOld: " + isDongleServiceRunning);
+        log.createLogger("MainActivity.onCreate() Starting DongleServiceOld: " + isDongleServiceRunning);
 
 
-        // Bind DongleService
-//        Intent mIntent = new Intent(this, DongleService.class);
+        // Bind DongleServiceOld
+//        Intent mIntent = new Intent(this, DongleServiceOld.class);
 //        bindDongleService();
 //        bindService(mIntent, serviceConnection, BIND_AUTO_CREATE);
 
@@ -241,15 +241,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
-        stopService(new Intent(this, DongleService.class));
+        stopService(new Intent(this, DongleServiceOld.class));
 
-        // Unbind from the DongleService
+        // Unbind from the DongleServiceOld
         if (isBound) {
             unbindService(mConnection);
             isBound = false;
         }
 
-        // unbind DongleService
+        // unbind DongleServiceOld
 //        if (isBound) {
 //            unbindService(serviceConnection);
 //            isBound = false;
@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
 //        dongleAccessPoint.destroyAccessPoint();
 //        wifiController.turnOnOffWifi(this, false);
         // TODO: check if work
-//        stopService(new Intent(this, DongleService.class));
+//        stopService(new Intent(this, DongleServiceOld.class));
 //        this.finish();
         Log.d(TAG, "MainActivity.onDestroy()");
         log.createLogger("MainActivity.onDestroy()");
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isServiceRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
-            if("com.wekast.wekastandroiddongle.services.DongleService".equals(service.service.getClassName())) {
+            if("com.wekast.wekastandroiddongle.services.DongleServiceOld".equals(service.service.getClassName())) {
                 return true;
             }
         }

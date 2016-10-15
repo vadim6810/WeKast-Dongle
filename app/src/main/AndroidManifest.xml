@@ -25,21 +25,23 @@
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".services.StartBroadcastReceiver"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+        <!-- <receiver -->
+        <!-- android:name=".services.StartBroadcastReceiver" -->
+        <!-- android:permission="android.permission.RECEIVE_BOOT_COMPLETED"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.BOOT_COMPLETED" /> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
 
-        <service android:name=".services.DongleService" />
+
+        <!-- <service android:name=".services.DongleServiceOld" /> -->
         <!-- service android:name="com.wekast.wekastandroiddongle.services.AccessPointService" / -->
 
 
@@ -54,17 +56,23 @@
         </receiver
         -->
 
-        <!--<activity-->
-            <!--android:name=".activity.FullscreenActivity"-->
-            <!--android:configChanges="orientation|keyboardHidden|screenSize"-->
-            <!--android:label="@string/title_activity_fullscreen"-->
-            <!--android:theme="@style/FullscreenTheme">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
+        <!-- <activity -->
+        <!-- android:name=".activity.FullscreenActivity" -->
+        <!-- android:configChanges="orientation|keyboardHidden|screenSize" -->
+        <!-- android:label="@string/title_activity_fullscreen" -->
+        <!-- android:theme="@style/FullscreenTheme"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
+        <service
+            android:name=".services.DongleService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

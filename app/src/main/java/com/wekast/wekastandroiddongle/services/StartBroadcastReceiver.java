@@ -27,9 +27,9 @@ public class StartBroadcastReceiver extends BroadcastReceiver {
         System.out.println("BOOT RECEIVED");
         Log.d(TAG, "StartBroadcastReceiver onReceive()");
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            Intent pushIntent = new Intent(context, DongleService.class);
+            Intent pushIntent = new Intent(context, DongleServiceOld.class);
             context.startService(pushIntent);
-            Log.d(TAG, "StartBroadcastReceiver onReceive() DongleService started");
+            Log.d(TAG, "StartBroadcastReceiver onReceive() DongleServiceOld started");
             System.out.println("BOOT RECEIVED dongleService started");
 
 //            pushIntent = new Intent();

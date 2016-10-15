@@ -2,10 +2,14 @@ package com.wekast.wekastandroiddongle.services;
 
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.ImageView;
 
+import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Loger;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.activity.MainActivity;
@@ -15,12 +19,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -30,7 +36,7 @@ import java.net.Socket;
  *
  * Created by YEHUDA on 8/1/2016.
  */
-public class DongleServiceEZS extends Service {
+public class DongleServiceOld extends Service {
 
     private static final String TAG = "wekastdongle";
     private static JSONObject jsonResponse;
@@ -42,9 +48,9 @@ public class DongleServiceEZS extends Service {
     private final IBinder mBinder = new DongleServiceBinder();
 
     public class DongleServiceBinder extends Binder {
-        public DongleServiceEZS getService() {
+        public DongleServiceOld getService() {
             // Return this instance of LocalService so clients can call public methods
-            return DongleServiceEZS.this;
+            return DongleServiceOld.this;
         }
     }
 
@@ -63,7 +69,7 @@ public class DongleServiceEZS extends Service {
         this.activity = activity;
     }
 
-    public DongleServiceEZS() {
+    public DongleServiceOld() {
         jsonResponse = Utils.createJsonResponse("jsonResponse", "ok");
         Thread socketServerThread = new Thread(new SocketDongleServerThread());
         socketServerThread.setName("DongleSocketServer");
@@ -168,11 +174,62 @@ public class DongleServiceEZS extends Service {
                                     JSONObject jsonObject = jsonTask.getJSONObject(i);
                                     String curCommmand = jsonObject.getString("command").toString();
                                     if (curCommmand.equals("show")) {
-                                        int slide = jsonObject.getInt("slide");
-                                        // show(slide);
+                                        String slide = jsonObject.getString("slide").toString();
+                                        nextSlide(Integer.valueOf(slide));
                                     }
                                     if (curCommmand.equals("accessPointConfig")) {
+                                        //sendResponse(socket);
                                         saveAccessPointConfig(jsonObject);
+                                    }
+                                    if (curCommmand.equals("uploadFile")) {
+                                        //sendResponse(socket);
+//                                        task = br.readLine();
+//                                        printMessageOnUi("RECEIVED:" + task);
+
+                                        int bytesRead;
+//                                        int current = 0;
+
+                                        String fileSize = br.readLine();
+                                        int FILE_SIZE = Integer.valueOf(fileSize); // test 6822921
+                                        // get from constant variable path
+                                        String FILE_TO_RECEIVE = "/storage/sdcard0/WeKast/presentation.ezs";
+//                                        String FILE_TO_RECEIVE = "/data/data/com.wekast.wekastandroiddongle/presentation.ezs";
+//                                        byte[] mybytearray = new byte[FILE_SIZE];
+                                        FileOutputStream fileOutputStream = new FileOutputStream(FILE_TO_RECEIVE);
+                                        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+
+
+//                                        bytesRead = inputStream.read(mybytearray, 0, mybytearray.length);
+//                                        current = bytesRead;
+//                                        do {
+//                                            bytesRead = inputStream.read(mybytearray, current, (mybytearray.length - current));
+//                                            if (bytesRead >= 0) current += bytesRead;
+//                                        } while (bytesRead > -1);
+//                                        bufferedOutputStream.write(mybytearray, 0, current);
+//                                        bufferedOutputStream.flush();
+
+
+
+                                        byte[] buffer = new byte[FILE_SIZE];
+
+
+//                                        while ((bytesRead = inputStream.read(buffer, 0, buffer.length)) != -1) {
+//                                            bufferedOutputStream.write(buffer, 0, bytesRead);
+//                                        }
+//                                        bufferedOutputStream.flush();
+
+                                        printMessageOnUi("RECEIVED:" + task);
+
+                                        // unzipping presentation
+                                        //Utils.unZipPresentation("/storage/sdcard0/WeKast/presentation.ezs");
+//                                        Utils.unZipPresentation("/mnt/sdcard/wekast/presentation.ezs");
+                                        printMessageOnUi("EZS UNZIPPED");
+
+                                        // work good with EZS good
+                                        // Utils.unZipPresentation("/storage/sdcard0/WeKast/flip_split3.ezs");
+                                        // printMessageOnUi("EZS UNZIPPED");
+
+                                        nextSlide(1);
                                     }
                                 }
                             }
@@ -184,14 +241,7 @@ public class DongleServiceEZS extends Service {
                             log.createLogger("DongleServiceOld.SocketDongleServerThread.run() ERROR: " + e.getMessage());
                         }
 
-
-                        SocketDongleServerReplyThread socketServerReplyThread = new SocketDongleServerReplyThread(
-                                socket, jsonResponse);
-                        socketServerReplyThread.setName("socketServerReplyThread");
-                        socketServerReplyThread.run();
-
-                        Log.d(TAG, "DongleServiceOld.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
-                        log.createLogger("DongleServiceOld.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
+                        sendResponse(socket);
                     }
                 }
             } catch (IOException e) {
@@ -199,18 +249,29 @@ public class DongleServiceEZS extends Service {
                 Log.d(TAG, "DongleServiceOld.SocketDongleServerThread.run(): ERROR: " + e.getMessage());
                 log.createLogger("DongleServiceOld.SocketDongleServerThread.run() ERROR: " + e.getMessage());
             }
-//            finally {
-//                if (serverSocket != null) {
-//                    try {
+            finally {
+
+                    try {
+                        if (inputStream != null) inputStream.close();
 //                        serverSocket.close();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                        Log.d(TAG, "DongleServiceOld: " + e);
-//                    }
-//                }
-//            }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Log.d(TAG, "DongleServiceOld: " + e);
+                    }
+
+            }
         }
     } // SocketDongleServerThread
+
+
+    private void sendResponse(Socket socket) {
+        SocketDongleServerReplyThread socketServerReplyThread = new SocketDongleServerReplyThread(
+                socket, jsonResponse);
+        socketServerReplyThread.setName("socketServerReplyThread");
+        socketServerReplyThread.run();
+        Log.d(TAG, "DongleServiceOld.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
+        log.createLogger("DongleServiceOld.SocketDongleServerThread.run() end of: " + socketServerReplyThread.getName());
+    }
 
     private class SocketDongleServerReplyThread extends Thread {
         private Socket hostThreadSocket;
@@ -223,20 +284,40 @@ public class DongleServiceEZS extends Service {
 
         @Override
         public void run() {
-            OutputStream outputStream;
+            OutputStream outputStream = null;
             try {
                 outputStream = hostThreadSocket.getOutputStream();
-                PrintStream printStream = new PrintStream(outputStream);
-                printStream.print(response);
-                printStream.flush();
-                printStream.close();
-                outputStream.close();
+//                PrintStream printStream = new PrintStream(outputStream);
+//                printStream.print(response);
+//                printStream.flush();
+//                printStream.close();
+//                outputStream.close();
+//                PrintWriter printWriter = new PrintWriter(outputStream, true);
+//                printWriter.print(response);
+//                printWriter.close();
+//                outputStream.close();
+
+                PrintWriter printWriter = new PrintWriter(outputStream, true);
+                printWriter.println(response);
+
+                Utils.setFieldSP(activity, "DONGLE_SERVICE_RESPONSE_SENDED", "1");
+
                 // TODO: comment after debug
-                printMessageOnUi("SENDED:" + response);
+                //printMessageOnUi("SENDED:" + response);
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.d(TAG, "DongleServiceOld.SocketDongleServerReplyThread.run() IOException " + e.getMessage());
                 log.createLogger("DongleServiceOld.SocketDongleServerReplyThread.run() IOException " + e.getMessage());
+            }
+            finally {
+                try {
+                    if (outputStream != null) outputStream.close();
+//                    if (hostThreadSocket != null) {
+//                        hostThreadSocket.close();
+//                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -253,7 +334,7 @@ public class DongleServiceEZS extends Service {
 //        Utils.setFieldSP(activity, "ACCESS_POINT_SSID_ON_APP", jsonObject.getString("ssid"));
 //        Utils.setFieldSP(activity, "ACCESS_POINT_PASS_ON_APP", jsonObject.getString("pass"));
 
-        printMessageOnUi("Connecting to " + newSsid + " " + newPass);
+
 //        activity.runOnUiThread(new Runnable() {
 //            @Override
 //            public void run() {
@@ -261,9 +342,32 @@ public class DongleServiceEZS extends Service {
 //            }
 //        });
 
+        waitWhileDongleServiceResponseSended();
+
         // Connect to Access Point of application
+        printMessageOnUi("Connecting to " + newSsid + " " + newPass);
         DongleWifi dongleWifi = new DongleWifi(activity);
         dongleWifi.connectToAccessPoint();
+    }
+
+    private void waitWhileDongleServiceResponseSended() {
+        String isResponseSended = "";
+        boolean sended = false;
+        while(!sended) {
+            isResponseSended = Utils.getFieldSP(activity, "DONGLE_SERVICE_RESPONSE_SENDED");
+            if (isResponseSended.equals("1")) {
+                sended = true;
+                Utils.setFieldSP(activity, "DONGLE_SERVICE_RESPONSE_SENDED", "0");
+            } else {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "DongleServiceOld.waitWhileDongleServiceResponseSended() " + e.getMessage());
+                }
+            }
+        }
+
     }
 
     public void printMessageOnUi(String message) {
@@ -272,6 +376,37 @@ public class DongleServiceEZS extends Service {
             @Override
             public void run() {
                 Utils.toastShowBottom(activity, curMessage);
+            }
+        });
+    }
+
+    /*public void startPresentation() {
+//        ImageView img= (ImageView) activity.findViewById(R.id.mainIMG);
+//        img.setImageResource(R.drawable.my_image);
+
+//        URL newurl = new URL("/storage/sdcard0/WeKast/cash/slides/1.jpg");
+//        mIcon_val = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+//        profile_photo.setImageBitmap(mIcon_val);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bmp = BitmapFactory.decodeFile("/storage/sdcard0/WeKast/cash/slides/1.jpg");
+                ImageView img = (ImageView) activity.findViewById(R.id.mainIMG);
+                img.setImageBitmap(bmp);
+            }
+        });
+    }*/
+
+    public void nextSlide(final int nSlide) {
+//        final String curSlide = String.valueOf(nSlide);
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bmp = BitmapFactory.decodeFile("/storage/sdcard0/WeKast/cash/slides/" + nSlide + ".jpg");
+//                Bitmap bmp = BitmapFactory.decodeFile("/mnt/sdcard/wekast/cash/slides/" + nSlide + ".jpg");
+                ImageView img = (ImageView) activity.findViewById(R.id.mainIMG);
+                img.setImageBitmap(bmp);
             }
         });
     }
