@@ -3,10 +3,6 @@ package com.wekast.wekastandroiddongle.controllers;
 
 import android.util.Log;
 
-import com.wekast.wekastandroiddongle.Utils.Utils;
-import com.wekast.wekastandroiddongle.models.DongleWifi;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -32,16 +29,18 @@ public class SocketController {
                 InputStream inputStream = socket.getInputStream();
                 OutputStream outputStream = socket.getOutputStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream));
+                PrintWriter printWriter = new PrintWriter(outputStream, true);
+
                 while (true) {
                     try {
                         String task = br.readLine();
-                        String answer = parseTask(task);
-                        bw.write(answer);
+                        if (task == null) {
+                            break;
+                        }
+                        printWriter.println(parseTask(task));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    inputStream.close();
                 }
             }
         } catch (IOException e) {
