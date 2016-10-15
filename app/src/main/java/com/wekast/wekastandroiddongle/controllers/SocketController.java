@@ -3,6 +3,8 @@ package com.wekast.wekastandroiddongle.controllers;
 
 import android.util.Log;
 
+import com.wekast.wekastandroiddongle.commands.ICommand;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,6 +20,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SocketController {
+
+    CommandController commandController;
+
+    public SocketController(CommandController commandController) {
+        this.commandController = commandController;
+    }
+
     public boolean waitForTask() {
 
         int port = 8888;
@@ -51,8 +60,15 @@ public class SocketController {
     }
 
     private String parseTask(String task) {
-        Log.i("Task", task);
-        return "Answer";
+        ICommand command = null;
+        try {
+            command = commandController.parseCommand(task);
+            return command.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // TODO: Good JSON Answer
+            return "bad command";
+        }
     }
 
 
