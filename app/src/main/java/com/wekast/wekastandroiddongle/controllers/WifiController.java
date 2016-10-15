@@ -1,4 +1,4 @@
-package com.wekast.wekastandroiddongle.wifiControllers;
+package com.wekast.wekastandroiddongle.controllers;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -8,8 +8,6 @@ import android.os.Build;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import static android.R.attr.enabled;
 
 /**
  * Created by ELAD on 10/14/2016.
@@ -97,5 +95,10 @@ public class WifiController {
 
     public WifiState getSavedWifiState() {
         return WifiState.WIFI_STATE_NONE;
+    }
+
+    public static enum WifiState {
+        WIFI_STATE_NONE,
+        WIFI_STATE_CONNECTED
     }
 }

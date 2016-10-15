@@ -10,8 +10,8 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.wekast.wekastandroiddongle.R;
-import com.wekast.wekastandroiddongle.wifiControllers.WifiController;
-import com.wekast.wekastandroiddongle.wifiControllers.WifiState;
+import com.wekast.wekastandroiddongle.controllers.SocketController;
+import com.wekast.wekastandroiddongle.controllers.WifiController;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -87,7 +87,8 @@ public class FullscreenActivity extends AppCompatActivity {
             return false;
         }
     };
-    private WifiController wifi;
+
+    private WifiController wifiController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,14 +114,15 @@ public class FullscreenActivity extends AppCompatActivity {
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 
-        wifi = new WifiController(getApplicationContext());
-        if (wifi.getSavedWifiState() == WifiState.WIFI_STATE_NONE) {
-            boolean result = wifi.startAP();
+        wifiController = new WifiController(getApplicationContext());
+        SocketController socketController = new SocketController();
+        if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_NONE) {
+            boolean result = wifiController.startAP();
             if (result) {
-//                DongleService.waitForConfig
+                socketController.waitForConfig();
             }
-        } else if (wifi.getSavedWifiState() == WifiState.WIFI_STATE_CONNECTED) {
-            wifi.startConnection();
+        } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_CONNECTED) {
+            wifiController.startConnection();
         }
         Log.i("Mylog", "eee");
     }
