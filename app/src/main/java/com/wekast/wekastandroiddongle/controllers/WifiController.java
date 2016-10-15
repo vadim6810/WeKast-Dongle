@@ -6,6 +6,8 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 
+import com.wekast.wekastandroiddongle.Utils.Utils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -99,6 +101,11 @@ public class WifiController {
 
     public WifiState getSavedWifiState() {
         return WifiState.WIFI_STATE_NONE;
+    }
+
+    public void saveWifiConfig(String ssid, String pass) {
+        Utils.setFieldSP(context, "ACCESS_POINT_SSID_ON_APP", ssid);
+        Utils.setFieldSP(context, "ACCESS_POINT_PASS_ON_APP", pass);
     }
 
     public static enum WifiState {
