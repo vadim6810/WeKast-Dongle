@@ -24,31 +24,35 @@ public class WifiController {
             String methodName = method.getName();
             if (methodName.equals("setWifiApEnabled")) {
                 setWifiApEnabled = method;
+                setWifiApEnabled.setAccessible(true);
             }
             if (methodName.equals("isWifiApEnabled")) {
                 isWifiApEnabled = method;
+                isWifiApEnabled.setAccessible(true);
             }
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     private static boolean setWifiApEnabled(WifiManager wifiManager, WifiConfiguration wifiConfiguration, boolean enabled) {
         try {
             return (boolean) setWifiApEnabled.invoke(wifiManager, wifiConfiguration, enabled);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
-            return false;
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
+        return false;
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     private boolean isWifiApEnabled(WifiManager wifiManager) {
         try {
             return (boolean) isWifiApEnabled.invoke(wifiManager);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
-            return false;
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
+        return false;
     }
 
     private Context context;
