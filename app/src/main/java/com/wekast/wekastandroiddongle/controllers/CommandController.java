@@ -24,7 +24,7 @@ public class CommandController {
         this.service = service;
     }
 
-    public ICommand parseCommand(String commandStr) throws Exception {
+    private ICommand parseCommand(String commandStr) throws Exception {
         ICommand command;
         try {
             JSONObject jsonRootObject = new JSONObject(commandStr);
@@ -38,11 +38,23 @@ public class CommandController {
                     throw new Exception("Unknown command");
             }
             command.parseArgs(jsonRootObject.getJSONObject("args"));
-
+            return command;
         } catch (JSONException e) {
             // TODO throw exception
             e.printStackTrace();
+            throw e;
         }
-        return null;
+    }
+
+    public String processTask(String task) {
+//        try {
+//            ICommand command = parseCommand(task);
+//            return command.execute();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            // TODO: Good JSON Answer
+//            return "bad command";
+//        }
+        return "Result";
     }
 }

@@ -4,17 +4,15 @@ package com.wekast.wekastandroiddongle.controllers;
 import android.util.Log;
 
 import com.wekast.wekastandroiddongle.commands.ICommand;
+import com.wekast.wekastandroiddongle.commands.WelcomeAnswer;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -40,19 +38,17 @@ public class SocketController {
                 OutputStream outputStream = socket.getOutputStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
                 PrintWriter printWriter = new PrintWriter(outputStream, true);
-
+                WelcomeAnswer answer = new WelcomeAnswer();
+                printWriter.println(answer);
                 while (true) {
-                    try {
-                        String task = br.readLine();
-                        if (task == null) {
-                            break;
-                        }
-                        printWriter.println(parseTask(task));
-                        if (Thread.interrupted()) {
-                            return;
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    String task = br.readLine();
+                    if (task == null || task.equals("")) {
+                        socket.close();
+                        break;
+                    }
+                    printWriter.println(commandController.processTask(task));
+                    if (Thread.interrupted()) {
+                        return;
                     }
                 }
             }
@@ -64,20 +60,9 @@ public class SocketController {
     }
 
     public void close() throws IOException {
+
         if (!serverSocket.isClosed())
             serverSocket.close();
-    }
-
-    private String parseTask(String task) {
-        ICommand command;
-        try {
-            command = commandController.parseCommand(task);
-            return command.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-            // TODO: Good JSON Answer
-            return "bad command";
-        }
     }
 
     public boolean waitForFile() {

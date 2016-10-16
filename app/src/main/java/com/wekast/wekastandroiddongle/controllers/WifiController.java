@@ -97,6 +97,10 @@ public class WifiController {
     public WifiController(Context context) {
         this.context = context;
         wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        // Сохраняем старые настройки точки доступа
+        oldConfig = getWifiApConfiguration(wifiManager);
+        // Сохраняем состояние Wifi
+        // TODO Сохранить состояние WIFI, WIFI_AP, WIFI_SSID
     }
 
     private WifiConfiguration configureWifi() {
@@ -113,12 +117,10 @@ public class WifiController {
      * @return
      */
     public boolean startAP() {
-        oldConfig = getWifiApConfiguration(wifiManager);
         return isWifiApEnabled(wifiManager) || setWifiApEnabled(wifiManager, configureWifi(), true);
     }
 
     public boolean stopAP() {
-        setWifiApConfiguration(wifiManager, oldConfig);
         return setWifiApEnabled(wifiManager, oldConfig, false);
     }
 
@@ -145,6 +147,7 @@ public class WifiController {
         if (isWifiApEnabled(wifiManager)) {
             stopAP();
         }
+        setWifiApConfiguration(wifiManager, oldConfig);
     }
 
     public static enum WifiState {

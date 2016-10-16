@@ -86,11 +86,11 @@ public class DongleService extends Service {
     public void onDestroy() {
         try {
             Log.i(TAG, "Service stopped");
+            socketController.close();
+            wifiController.restore();
             if (thread != null) {
                 thread.interrupt();
             }
-            socketController.close();
-            wifiController.restore();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

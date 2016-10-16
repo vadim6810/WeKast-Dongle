@@ -36,14 +36,15 @@ public class FullscreenActivity extends AppCompatActivity {
                 }
             }
         });
+
+        if (requestSettingsPermissions()) {
+            startDongleService();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (requestSettingsPermissions()) {
-            startDongleService();
-        }
     }
 
     private boolean requestSettingsPermissions() {
@@ -59,11 +60,11 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private void startDongleService() {
         serviceStatus = true;
-        getApplicationContext().startService(new Intent(getApplicationContext(), DongleService.class));
+        startService(new Intent(this, DongleService.class));
     }
 
     private void stopDongleService() {
         serviceStatus = false;
-        stopService(new Intent(getApplicationContext(), DongleService.class));
+        stopService(new Intent(this, DongleService.class));
     }
 }
