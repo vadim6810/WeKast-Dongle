@@ -16,8 +16,6 @@ import com.wekast.wekastandroiddongle.services.DongleService;
  */
 public class FullscreenActivity extends AppCompatActivity {
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
