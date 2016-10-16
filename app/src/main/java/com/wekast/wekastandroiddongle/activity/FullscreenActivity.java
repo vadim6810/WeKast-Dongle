@@ -1,12 +1,13 @@
 package com.wekast.wekastandroiddongle.activity;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 
 import com.wekast.wekastandroiddongle.R;
-import com.wekast.wekastandroiddongle.controllers.SocketController;
-import com.wekast.wekastandroiddongle.controllers.WifiController;
 import com.wekast.wekastandroiddongle.services.DongleService;
 
 /**
@@ -16,23 +17,34 @@ import com.wekast.wekastandroiddongle.services.DongleService;
 public class FullscreenActivity extends AppCompatActivity {
 
 
-    private WifiController wifiController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen);
-
-//        int canWriteSettings = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_SETTINGS)
-//        if (canWriteSettings == PackageManager.PERMISSION_DENIED) {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.WRITE_SETTINGS},
-//                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-//        }
-
-        getApplicationContext().startService(new Intent(getApplicationContext(), DongleService.class));
-
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (requestSettingsPermissions()) {
+            ComponentName componentName = startDongleService();
+        }
+    }
+
+    private boolean requestSettingsPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.System.canWrite(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                startActivity(intent);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private ComponentName startDongleService() {
+        return getApplicationContext().startService(new Intent(getApplicationContext(), DongleService.class));
+    }
 
 }
