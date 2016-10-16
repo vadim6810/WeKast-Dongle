@@ -18,21 +18,22 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class SocketController {
 
-    CommandController commandController;
+    public static final String TAG = "DongleSocket";
+    private CommandController commandController;
+    private ServerSocket serverSocket;
 
-    public SocketController(CommandController commandController) {
+    public SocketController(CommandController commandController) throws IOException {
         this.commandController = commandController;
+        int port = 8888;
+        serverSocket = new ServerSocket(port);
     }
 
-    public boolean waitForTask() {
-
-        int port = 8888;
-
+    public void waitForTask() {
         try {
-            ServerSocket serverSocket = new ServerSocket(port);
             while (true) {
                 Socket socket = serverSocket.accept();
                 InputStream inputStream = socket.getInputStream();
@@ -47,20 +48,28 @@ public class SocketController {
                             break;
                         }
                         printWriter.println(parseTask(task));
+                        if (Thread.interrupted()) {
+                            return;
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             }
+        } catch (SocketException e) {
+            Log.i(TAG, "Socket closed: interrupting");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        return false;
+    public void close() throws IOException {
+        if (!serverSocket.isClosed())
+            serverSocket.close();
     }
 
     private String parseTask(String task) {
-        ICommand command = null;
+        ICommand command;
         try {
             command = commandController.parseCommand(task);
             return command.execute();
@@ -69,21 +78,6 @@ public class SocketController {
             // TODO: Good JSON Answer
             return "bad command";
         }
-    }
-
-
-    private void saveAccessPointConfig(JSONObject jsonObject) throws JSONException {
-        String newSsid = jsonObject.getString("ssid");
-        String newPass = jsonObject.getString("pass");
-
-        // Save received ssid and pass in shared preferences
-//        Utils.setFieldSP(activity, "ACCESS_POINT_SSID_ON_APP", newSsid);
-//        Utils.setFieldSP(activity, "ACCESS_POINT_PASS_ON_APP", newPass);
-
-    }
-
-    public boolean waitForCommand() {
-        return false;
     }
 
     public boolean waitForFile() {

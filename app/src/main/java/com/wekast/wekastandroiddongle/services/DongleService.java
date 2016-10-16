@@ -1,5 +1,6 @@
 package com.wekast.wekastandroiddongle.services;
 
+import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -8,6 +9,8 @@ import android.util.Log;
 import com.wekast.wekastandroiddongle.controllers.CommandController;
 import com.wekast.wekastandroiddongle.controllers.SocketController;
 import com.wekast.wekastandroiddongle.controllers.WifiController;
+
+import java.io.IOException;
 
 public class DongleService extends Service {
 
@@ -43,9 +46,6 @@ public class DongleService extends Service {
     }
 
     private void init() {
-        wifiController = new WifiController(getApplicationContext());
-        commandController = new CommandController(this);
-        socketController = new SocketController(commandController);
         if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_NONE) {
             boolean result = wifiController.startAP();
             if (result) {
@@ -58,8 +58,6 @@ public class DongleService extends Service {
 
     public static final String TAG = "Dongle";
 
-    public DongleService() {
-    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -69,18 +67,34 @@ public class DongleService extends Service {
 
     @Override
     public void onCreate() {
-        super.onCreate();
         Log.i(TAG, "Service started");
+        super.onCreate();
 
-        thread = new ServiceThread();
-        thread.start();
-
+        try {
+            wifiController = new WifiController(getApplicationContext());
+            commandController = new CommandController(this);
+            socketController = new SocketController(commandController);
+            thread = new ServiceThread();
+            thread.start();
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+            stopSelf();
+        }
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        // TODO: interrupt
-        thread.stop();
+        try {
+            Log.i(TAG, "Service stopped");
+            if (thread != null) {
+                thread.interrupt();
+            }
+            socketController.close();
+            wifiController.restore();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            super.onDestroy();
+        }
     }
 }

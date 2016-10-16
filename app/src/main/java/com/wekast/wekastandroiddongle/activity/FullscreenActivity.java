@@ -6,6 +6,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.services.DongleService;
@@ -16,17 +18,31 @@ import com.wekast.wekastandroiddongle.services.DongleService;
  */
 public class FullscreenActivity extends AppCompatActivity {
 
+    private boolean serviceStatus = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fullscreen);
+
+        Button button = (Button) findViewById(R.id.dummy_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (serviceStatus) {
+                    stopDongleService();
+                } else {
+                    startDongleService();
+                }
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (requestSettingsPermissions()) {
-            ComponentName componentName = startDongleService();
+            startDongleService();
         }
     }
 
@@ -41,8 +57,13 @@ public class FullscreenActivity extends AppCompatActivity {
         return true;
     }
 
-    private ComponentName startDongleService() {
-        return getApplicationContext().startService(new Intent(getApplicationContext(), DongleService.class));
+    private void startDongleService() {
+        serviceStatus = true;
+        getApplicationContext().startService(new Intent(getApplicationContext(), DongleService.class));
     }
 
+    private void stopDongleService() {
+        serviceStatus = false;
+        stopService(new Intent(getApplicationContext(), DongleService.class));
+    }
 }

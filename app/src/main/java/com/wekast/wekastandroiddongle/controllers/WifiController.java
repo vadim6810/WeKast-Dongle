@@ -1,10 +1,8 @@
 package com.wekast.wekastandroiddongle.controllers;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 
 import com.wekast.wekastandroiddongle.Utils.Utils;
 
@@ -106,6 +104,10 @@ public class WifiController {
     public void saveWifiConfig(String ssid, String pass) {
         Utils.setFieldSP(context, "ACCESS_POINT_SSID_ON_APP", ssid);
         Utils.setFieldSP(context, "ACCESS_POINT_PASS_ON_APP", pass);
+    }
+
+    public void restore() {
+        // TODO restore wifi settings back
     }
 
     public static enum WifiState {
