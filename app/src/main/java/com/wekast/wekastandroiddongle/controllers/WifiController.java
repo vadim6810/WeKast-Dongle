@@ -16,6 +16,52 @@ import java.lang.reflect.Method;
 public class WifiController {
     private static Method setWifiApEnabled;
     private static Method isWifiApEnabled;
+    private static Method getWifiApConfiguration;
+    private static Method setWifiApConfiguration;
+
+    private static boolean setWifiApEnabled(WifiManager wifiManager, WifiConfiguration wifiConfiguration, boolean enabled) {
+        try {
+            return (boolean) setWifiApEnabled.invoke(wifiManager, wifiConfiguration, enabled);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private static boolean isWifiApEnabled(WifiManager wifiManager) {
+        try {
+            return (boolean) isWifiApEnabled.invoke(wifiManager);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private static WifiConfiguration getWifiApConfiguration(WifiManager wifiManager) {
+        try {
+            return (WifiConfiguration) getWifiApConfiguration.invoke(wifiManager);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static boolean setWifiApConfiguration(WifiManager wifiManager, WifiConfiguration wifiConfiguration) {
+        try {
+            return (boolean) setWifiApConfiguration.invoke(wifiManager, wifiConfiguration);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     static {
         // lookup methods and fields not defined publicly in the SDK.
@@ -30,35 +76,27 @@ public class WifiController {
                 isWifiApEnabled = method;
                 isWifiApEnabled.setAccessible(true);
             }
+            if (methodName.equals("getWifiApConfiguration")) {
+                getWifiApConfiguration = method;
+                getWifiApConfiguration.setAccessible(true);
+            }
+            if (methodName.equals("setWifiApConfiguration")) {
+                setWifiApConfiguration = method;
+                setWifiApConfiguration.setAccessible(true);
+            }
         }
     }
 
-    private static boolean setWifiApEnabled(WifiManager wifiManager, WifiConfiguration wifiConfiguration, boolean enabled) {
-        try {
-            return (boolean) setWifiApEnabled.invoke(wifiManager, wifiConfiguration, enabled);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
-    private boolean isWifiApEnabled(WifiManager wifiManager) {
-        try {
-            return (boolean) isWifiApEnabled.invoke(wifiManager);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
+
+    private final WifiManager wifiManager;
     private Context context;
+    private WifiConfiguration oldConfig;
 
     public WifiController(Context context) {
         this.context = context;
+        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
     }
 
     private WifiConfiguration configureWifi() {
@@ -75,17 +113,13 @@ public class WifiController {
      * @return
      */
     public boolean startAP() {
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        if (!isWifiApEnabled(wifiManager)) {
-            return setWifiApEnabled(wifiManager, configureWifi(), true);
-        } else {
-            // TODO check settings
-            return true;
-        }
+        oldConfig = getWifiApConfiguration(wifiManager);
+        return isWifiApEnabled(wifiManager) || setWifiApEnabled(wifiManager, configureWifi(), true);
     }
 
     public boolean stopAP() {
-        return setWifiApEnabled((WifiManager) context.getSystemService(Context.WIFI_SERVICE), configureWifi(), false);
+        setWifiApConfiguration(wifiManager, oldConfig);
+        return setWifiApEnabled(wifiManager, oldConfig, false);
     }
 
     /**
@@ -108,6 +142,9 @@ public class WifiController {
 
     public void restore() {
         // TODO restore wifi settings back
+        if (isWifiApEnabled(wifiManager)) {
+            stopAP();
+        }
     }
 
     public static enum WifiState {
