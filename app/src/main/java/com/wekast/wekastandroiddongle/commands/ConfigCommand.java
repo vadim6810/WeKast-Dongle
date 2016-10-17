@@ -1,6 +1,5 @@
 package com.wekast.wekastandroiddongle.commands;
 
-import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.controllers.CommandController;
 import com.wekast.wekastandroiddongle.controllers.WifiController;
 
@@ -11,22 +10,24 @@ import org.json.JSONObject;
  * Created by ELAD on 10/15/2016.
  */
 
-public class Config implements ICommand {
+public class ConfigCommand implements ICommand {
+
     private CommandController controller;
 
-    public Config(CommandController controller) {
+    public ConfigCommand(CommandController controller) {
         this.controller = controller;
     }
 
     private String ssid;
     private String password;
+
     @Override
-    public String execute() {
+    public Answer execute() {
         WifiController wifiController = controller.getService().getWifiController();
         wifiController.saveWifiConfig(ssid, password);
         // TODO switch state of wifi
         //wifiController.changeState();
-        return null;
+        return new ConfigAnswer();
     }
 
     @Override

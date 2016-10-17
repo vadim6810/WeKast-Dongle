@@ -1,10 +1,13 @@
 package com.wekast.wekastandroiddongle.controllers;
 
-import com.wekast.wekastandroiddongle.commands.Config;
+import android.util.Log;
+
+import com.wekast.wekastandroiddongle.commands.Answer;
+import com.wekast.wekastandroiddongle.commands.ConfigCommand;
+import com.wekast.wekastandroiddongle.commands.ErrorAnswer;
 import com.wekast.wekastandroiddongle.commands.ICommand;
 import com.wekast.wekastandroiddongle.services.DongleService;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,6 +17,7 @@ import org.json.JSONObject;
 
 public class CommandController {
 
+    public static final String TAG = "Dongle";
     private DongleService service;
 
     public DongleService getService() {
@@ -31,7 +35,7 @@ public class CommandController {
             String commandName = jsonRootObject.getString("command");
             switch (commandName) {
                 case "config":
-                    command = new Config(this);
+                    command = new ConfigCommand(this);
                     break;
                 default:
                     // TODO: make self class exception
@@ -46,15 +50,13 @@ public class CommandController {
         }
     }
 
-    public String processTask(String task) {
-//        try {
-//            ICommand command = parseCommand(task);
-//            return command.execute();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            // TODO: Good JSON Answer
-//            return "bad command";
-//        }
-        return "Result";
+    Answer processTask(String task) {
+        try {
+            ICommand command = parseCommand(task);
+            return command.execute();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+            return new ErrorAnswer(e);
+        }
     }
 }

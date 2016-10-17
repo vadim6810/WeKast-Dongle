@@ -8,6 +8,6 @@ import org.json.JSONObject;
  */
 
 public interface ICommand {
-    public String execute();
-    public void parseArgs(JSONObject args) throws JSONException;
+    Answer execute();
+    void parseArgs(JSONObject args) throws JSONException;
 }
