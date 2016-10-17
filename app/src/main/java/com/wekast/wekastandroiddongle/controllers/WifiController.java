@@ -14,11 +14,6 @@ import java.lang.reflect.Method;
  */
 
 public class WifiController {
-    private static Method setWifiApEnabled;
-    private static Method isWifiApEnabled;
-    private static Method getWifiApConfiguration;
-    private static Method setWifiApConfiguration;
-
     private static boolean setWifiApEnabled(WifiManager wifiManager, WifiConfiguration wifiConfiguration, boolean enabled) {
         try {
             return (boolean) setWifiApEnabled.invoke(wifiManager, wifiConfiguration, enabled);
@@ -63,6 +58,11 @@ public class WifiController {
         return false;
     }
 
+    private static Method setWifiApEnabled;
+    private static Method isWifiApEnabled;
+    private static Method getWifiApConfiguration;
+    private static Method setWifiApConfiguration;
+
     static {
         // lookup methods and fields not defined publicly in the SDK.
         Class<?> cls = WifiManager.class;
@@ -87,9 +87,7 @@ public class WifiController {
         }
     }
 
-
-
-
+    private final boolean wifiEnabled;
     private final WifiManager wifiManager;
     private Context context;
     private WifiConfiguration oldConfig;
@@ -100,7 +98,7 @@ public class WifiController {
         // Сохраняем старые настройки точки доступа
         oldConfig = getWifiApConfiguration(wifiManager);
         // Сохраняем состояние Wifi
-        // TODO Сохранить состояние WIFI, WIFI_AP, WIFI_SSID
+        wifiEnabled = wifiManager.isWifiEnabled();
     }
 
     private WifiConfiguration configureWifi() {
@@ -134,7 +132,7 @@ public class WifiController {
     }
 
     public WifiState getSavedWifiState() {
-        return WifiState.WIFI_STATE_NONE;
+        return WifiState.WIFI_STATE_OFF;
     }
 
     public void saveWifiConfig(String ssid, String pass) {
@@ -147,11 +145,13 @@ public class WifiController {
         if (isWifiApEnabled(wifiManager)) {
             stopAP();
         }
+        wifiManager.setWifiEnabled(wifiEnabled);
         setWifiApConfiguration(wifiManager, oldConfig);
     }
 
     public static enum WifiState {
-        WIFI_STATE_NONE,
+        WIFI_STATE_OFF,
+        WIFI_STATE_AP,
         WIFI_STATE_CONNECTED
     }
 }

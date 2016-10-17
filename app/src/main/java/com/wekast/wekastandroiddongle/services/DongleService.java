@@ -1,6 +1,5 @@
 package com.wekast.wekastandroiddongle.services;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -46,7 +45,7 @@ public class DongleService extends Service {
     }
 
     private void init() {
-        if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_NONE) {
+        if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_OFF) {
             boolean result = wifiController.startAP();
             if (result) {
                 socketController.waitForTask();
