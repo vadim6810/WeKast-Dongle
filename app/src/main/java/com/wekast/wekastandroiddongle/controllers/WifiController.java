@@ -14,6 +14,17 @@ import java.lang.reflect.Method;
  */
 
 public class WifiController {
+
+
+    private static final String AP_SSID_KEY = "ACCESS_POINT_SSID_ON_APP";
+    private static final String AP_PASS_KEY = "ACCESS_POINT_PASS_ON_APP";
+
+    private static Method setWifiApEnabled;
+    private static Method isWifiApEnabled;
+    private static Method getWifiApConfiguration;
+    private static Method setWifiApConfiguration;
+
+
     private static boolean setWifiApEnabled(WifiManager wifiManager, WifiConfiguration wifiConfiguration, boolean enabled) {
         try {
             return (boolean) setWifiApEnabled.invoke(wifiManager, wifiConfiguration, enabled);
@@ -58,10 +69,6 @@ public class WifiController {
         return false;
     }
 
-    private static Method setWifiApEnabled;
-    private static Method isWifiApEnabled;
-    private static Method getWifiApConfiguration;
-    private static Method setWifiApConfiguration;
 
     static {
         // lookup methods and fields not defined publicly in the SDK.
@@ -136,8 +143,8 @@ public class WifiController {
     }
 
     public void saveWifiConfig(String ssid, String pass) {
-        Utils.setFieldSP(context, "ACCESS_POINT_SSID_ON_APP", ssid);
-        Utils.setFieldSP(context, "ACCESS_POINT_PASS_ON_APP", pass);
+        Utils.setFieldSP(context, AP_SSID_KEY, ssid);
+        Utils.setFieldSP(context, AP_PASS_KEY, pass);
     }
 
     public void restore() {
@@ -147,6 +154,13 @@ public class WifiController {
         }
         wifiManager.setWifiEnabled(wifiEnabled);
         setWifiApConfiguration(wifiManager, oldConfig);
+    }
+
+    public void changeState(WifiState wifiState) {
+        if (wifiState == WifiState.WIFI_STATE_AP) {
+            stopAP();
+//            wifiManager
+        }
     }
 
     public static enum WifiState {

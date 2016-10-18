@@ -26,7 +26,7 @@ public class ConfigCommand implements ICommand {
         WifiController wifiController = controller.getService().getWifiController();
         wifiController.saveWifiConfig(ssid, password);
         // TODO switch state of wifi
-        //wifiController.changeState();
+        wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECTED);
         return new ConfigAnswer();
     }
 
