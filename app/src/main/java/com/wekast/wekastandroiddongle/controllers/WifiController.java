@@ -24,6 +24,7 @@ public class WifiController {
     private static Method getWifiApConfiguration;
     private static Method setWifiApConfiguration;
 
+    private WifiState curWifiState = WifiState.WIFI_STATE_OFF;
 
     private static boolean setWifiApEnabled(WifiManager wifiManager, WifiConfiguration wifiConfiguration, boolean enabled) {
         try {
@@ -121,11 +122,11 @@ public class WifiController {
      *
      * @return
      */
-    public boolean startAP() {
+    private boolean startAP() {
         return isWifiApEnabled(wifiManager) || setWifiApEnabled(wifiManager, configureWifi(), true);
     }
 
-    public boolean stopAP() {
+    private boolean stopAP() {
         return setWifiApEnabled(wifiManager, oldConfig, false);
     }
 
@@ -139,7 +140,8 @@ public class WifiController {
     }
 
     public WifiState getSavedWifiState() {
-        return WifiState.WIFI_STATE_OFF;
+//        return WifiState.WIFI_STATE_OFF;
+        return curWifiState;
     }
 
     public void saveWifiConfig(String ssid, String pass) {
@@ -158,15 +160,18 @@ public class WifiController {
 
     public void changeState(WifiState wifiState) {
         //todo in progress
-        if (wifiState == WifiState.WIFI_STATE_AP) {
+        if (wifiState == WifiState.WIFI_STATE_CONNECT) {
             stopAP();
-//            wifiManager
+            curWifiState = WifiState.WIFI_STATE_CONNECT;
+        } else if (wifiState == WifiState.WIFI_STATE_AP) {
+            startAP();
+            curWifiState = WifiState.WIFI_STATE_AP;
         }
     }
 
     public enum WifiState {
         WIFI_STATE_OFF,
         WIFI_STATE_AP,
-        WIFI_STATE_CONNECTED
+        WIFI_STATE_CONNECT
     }
 }
