@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -34,7 +35,7 @@ public class SocketController {
         try {
             while (true) {
                 Socket socket = serverSocket.accept();
-//                socket.getInetAddress();
+                InetAddress clientInetAddress = socket.getInetAddress();
                 InputStream inputStream = socket.getInputStream();
                 OutputStream outputStream = socket.getOutputStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));

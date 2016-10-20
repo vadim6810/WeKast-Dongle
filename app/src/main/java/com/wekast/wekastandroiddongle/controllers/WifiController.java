@@ -136,11 +136,12 @@ public class WifiController {
      * @return
      */
     public boolean startConnection() {
+
+
         return false;
     }
 
     public WifiState getSavedWifiState() {
-//        return WifiState.WIFI_STATE_OFF;
         return curWifiState;
     }
 
@@ -162,11 +163,16 @@ public class WifiController {
         //todo in progress
         if (wifiState == WifiState.WIFI_STATE_CONNECT) {
             stopAP();
+            startConnection();
             curWifiState = WifiState.WIFI_STATE_CONNECT;
         } else if (wifiState == WifiState.WIFI_STATE_AP) {
             startAP();
             curWifiState = WifiState.WIFI_STATE_AP;
         }
+//        else if (wifiState == WifiState.WIFI_STATE_OFF) {
+//            stopAP();
+//            curWifiState = WifiState.WIFI_STATE_AP;
+//        }
     }
 
     public enum WifiState {

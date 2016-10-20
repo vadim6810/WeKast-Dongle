@@ -8,6 +8,7 @@ import com.wekast.wekastandroiddongle.commands.ErrorAnswer;
 import com.wekast.wekastandroiddongle.commands.ICommand;
 import com.wekast.wekastandroiddongle.services.DongleService;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,7 +42,7 @@ public class CommandController {
                     // TODO: make self class exception
                     throw new Exception("Unknown command");
             }
-            command.parseArgs(jsonRootObject.getJSONObject("args"));
+            command.parseArgs(jsonRootObject.getJSONArray("args"));
             return command;
         } catch (JSONException e) {
             // TODO throw exception
