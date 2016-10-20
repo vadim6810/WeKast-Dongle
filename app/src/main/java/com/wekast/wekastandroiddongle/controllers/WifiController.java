@@ -157,13 +157,14 @@ public class WifiController {
     }
 
     public void changeState(WifiState wifiState) {
+        //todo in progress
         if (wifiState == WifiState.WIFI_STATE_AP) {
             stopAP();
 //            wifiManager
         }
     }
 
-    public static enum WifiState {
+    public enum WifiState {
         WIFI_STATE_OFF,
         WIFI_STATE_AP,
         WIFI_STATE_CONNECTED

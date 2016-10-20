@@ -46,11 +46,12 @@ public class DongleService extends Service {
 
     private void init() {
         if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_OFF) {
-            boolean result = wifiController.startAP();
+            boolean result = wifiController.startAP(); // TODO change state
             if (result) {
                 socketController.waitForTask();
             }
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_CONNECTED) {
+            // TODO remove
             wifiController.startConnection();
         }
     }

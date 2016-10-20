@@ -34,6 +34,7 @@ public class SocketController {
         try {
             while (true) {
                 Socket socket = serverSocket.accept();
+//                socket.getInetAddress();
                 InputStream inputStream = socket.getInputStream();
                 OutputStream outputStream = socket.getOutputStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
