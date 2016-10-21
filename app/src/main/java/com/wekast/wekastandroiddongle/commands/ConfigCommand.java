@@ -31,10 +31,9 @@ public class ConfigCommand implements ICommand {
         return new ConfigAnswer();
     }
 
-//    {"command":"config","args":[{"ssid":"wekastrandom","password":"87654321"}]}
+//    {"command":"config","args":{"ssid":"wekastrandom","password":"87654321"}}
     @Override
-    public void parseArgs(JSONArray jsonArray) throws JSONException {
-        JSONObject jsonObject = jsonArray.getJSONObject(0);
+    public void parseArgs(JSONObject jsonObject) throws JSONException {
         ssid = jsonObject.getString("ssid");
         password = jsonObject.getString("password");
     }

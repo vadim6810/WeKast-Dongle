@@ -1,12 +1,13 @@
 package com.wekast.wekastandroiddongle.commands;
 
-        import org.json.JSONArray;
-        import org.json.JSONException;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by ELAD on 10/15/2016.
  */
 
 public interface ICommand {
     Answer execute();
-    void parseArgs(JSONArray args) throws JSONException;
+    void parseArgs(JSONObject args) throws JSONException;
 }

@@ -42,7 +42,8 @@ public class CommandController {
                     // TODO: make self class exception
                     throw new Exception("Unknown command");
             }
-            command.parseArgs(jsonRootObject.getJSONArray("args"));
+            command.parseArgs(jsonRootObject.getJSONObject("args"));
+//            command.parseArgs(jsonRootObjectgetJSONArray("args"));
             return command;
         } catch (JSONException e) {
             // TODO throw exception
