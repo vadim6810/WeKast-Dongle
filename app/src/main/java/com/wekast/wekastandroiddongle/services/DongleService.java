@@ -50,7 +50,7 @@ public class DongleService extends Service {
             socketController.waitForTask();
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_CONNECT) {
             // TODO remove
-            wifiController.startConnection();
+//            wifiController.startConnection();
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_AP) {
 
         }

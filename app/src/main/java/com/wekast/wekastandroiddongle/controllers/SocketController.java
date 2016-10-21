@@ -31,6 +31,7 @@ public class SocketController {
         serverSocket = new ServerSocket(port);
     }
 
+    // TODO: after connecting to AP of Client not responding on port socket
     public void waitForTask() {
         try {
             while (true) {

@@ -3,11 +3,13 @@ package com.wekast.wekastandroiddongle.controllers;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import com.wekast.wekastandroiddongle.Utils.Utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * Created by ELAD on 10/14/2016.
@@ -18,6 +20,7 @@ public class WifiController {
 
     private static final String AP_SSID_KEY = "ACCESS_POINT_SSID_ON_APP";
     private static final String AP_PASS_KEY = "ACCESS_POINT_PASS_ON_APP";
+    private static final String TAG = "dongle.wekast";
 
     private static Method setWifiApEnabled;
     private static Method isWifiApEnabled;
@@ -117,6 +120,14 @@ public class WifiController {
         return wifiConfig;
     }
 
+    private WifiConfiguration configureWifi(String ssid, String pass) {
+        WifiConfiguration wifiConfig = new WifiConfiguration();
+        wifiConfig.SSID = "\"" + ssid + "\"";
+        wifiConfig.preSharedKey = "\"" + pass + "\"";
+        wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+        return wifiConfig;
+    }
+
     /**
      * Start Access Point on Dongle with default settings
      *
@@ -136,9 +147,20 @@ public class WifiController {
      * @return
      */
     public boolean startConnection() {
+        wifiManager.setWifiEnabled(true);
+        String curSsid = Utils.getFieldSP(context,AP_SSID_KEY);
+        String curPass = Utils.getFieldSP(context,AP_PASS_KEY);
+        WifiConfiguration wifiConfig = configureWifi(curSsid, curPass);
 
+        int networkId = wifiManager.addNetwork(wifiConfig);
+        if (networkId < 0) {
+            return false;
+        }
+        wifiManager.disconnect();
+        wifiManager.enableNetwork(networkId, true);
+        wifiManager.reconnect();
 
-        return false;
+        return true;
     }
 
     public WifiState getSavedWifiState() {
