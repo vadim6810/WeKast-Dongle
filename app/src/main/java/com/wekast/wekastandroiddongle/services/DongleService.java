@@ -49,8 +49,6 @@ public class DongleService extends Service {
             wifiController.changeState(WifiController.WifiState.WIFI_STATE_AP);
             socketController.waitForTask();
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_CONNECT) {
-            // TODO remove
-//            wifiController.startConnection();
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_AP) {
         }
     }

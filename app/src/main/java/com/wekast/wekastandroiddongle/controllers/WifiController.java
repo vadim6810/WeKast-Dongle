@@ -1,10 +1,14 @@
 package com.wekast.wekastandroiddongle.controllers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.widget.TextView;
 
+import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Utils;
+import com.wekast.wekastandroiddongle.activity.FullscreenActivity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -98,6 +102,8 @@ public class WifiController {
     private final WifiManager wifiManager;
     private Context context;
     private WifiConfiguration oldConfig;
+    Activity mainActivity = FullscreenActivity.getMainActivity();
+    TextView textView = (TextView) mainActivity.findViewById(R.id.logger);
 
     public WifiController(Context context) {
         this.context = context;
@@ -130,11 +136,15 @@ public class WifiController {
      * @return
      */
     private boolean startAP() {
-        return isWifiApEnabled(wifiManager) || setWifiApEnabled(wifiManager, configureWifi(), true);
+        boolean result = isWifiApEnabled(wifiManager) || setWifiApEnabled(wifiManager, configureWifi(), true);
+        logToTextView("Accesss Point started", String.valueOf(result));
+        return result;
     }
 
     public boolean stopAP() {
-        return setWifiApEnabled(wifiManager, oldConfig, false);
+        boolean result = setWifiApEnabled(wifiManager, oldConfig, false);
+        logToTextView("Accesss Point stopped", String.valueOf(result));
+        return result;
     }
 
     /**
@@ -163,6 +173,7 @@ public class WifiController {
         wifiManager.enableNetwork(networkId, true);
         wifiManager.reconnect();
 
+        logToTextView("Connected to", curSsid);
         return true;
     }
 
@@ -200,6 +211,15 @@ public class WifiController {
         WIFI_STATE_OFF,
         WIFI_STATE_AP,
         WIFI_STATE_CONNECT
+    }
+
+    private void logToTextView(final String message, final String variable) {
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textView.append(message + ": " + variable + "\n");
+            }
+        });
     }
 
 }

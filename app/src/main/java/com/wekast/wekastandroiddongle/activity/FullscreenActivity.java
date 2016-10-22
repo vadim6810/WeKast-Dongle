@@ -1,12 +1,12 @@
 package com.wekast.wekastandroiddongle.activity;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.services.DongleService;
@@ -18,23 +18,35 @@ import com.wekast.wekastandroiddongle.services.DongleService;
 public class FullscreenActivity extends AppCompatActivity {
 
     private boolean serviceStatus = false;
+    private static Context context;
+    private static Activity activity;
+
+    public static Context getAppContext() {
+        return FullscreenActivity.context;
+    }
+
+    public static Activity getMainActivity() {
+        return FullscreenActivity.activity;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FullscreenActivity.context = getApplicationContext();
+        FullscreenActivity.activity = this;
         setContentView(R.layout.activity_fullscreen);
 
-        Button button = (Button) findViewById(R.id.dummy_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (serviceStatus) {
-                    stopDongleService();
-                } else {
-                    startDongleService();
-                }
-            }
-        });
+//        Button button = (Button) findViewById(R.id.dummy_button);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (serviceStatus) {
+//                    stopDongleService();
+//                } else {
+//                    startDongleService();
+//                }
+//            }
+//        });
 
         if (requestSettingsPermissions()) {
             startDongleService();
@@ -58,12 +70,12 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void startDongleService() {
-        serviceStatus = true;
+//        serviceStatus = true;
         startService(new Intent(this, DongleService.class));
     }
 
     private void stopDongleService() {
-        serviceStatus = false;
+//        serviceStatus = false;
         stopService(new Intent(this, DongleService.class));
     }
 
