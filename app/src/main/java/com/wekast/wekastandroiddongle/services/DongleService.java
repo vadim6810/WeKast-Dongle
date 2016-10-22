@@ -52,12 +52,10 @@ public class DongleService extends Service {
             // TODO remove
 //            wifiController.startConnection();
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_AP) {
-
         }
     }
 
     public static final String TAG = "Dongle";
-
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -97,4 +95,5 @@ public class DongleService extends Service {
             super.onDestroy();
         }
     }
+
 }

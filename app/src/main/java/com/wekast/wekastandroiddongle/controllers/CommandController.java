@@ -43,7 +43,6 @@ public class CommandController {
                     throw new Exception("Unknown command");
             }
             command.parseArgs(jsonRootObject.getJSONObject("args"));
-//            command.parseArgs(jsonRootObjectgetJSONArray("args"));
             return command;
         } catch (JSONException e) {
             // TODO throw exception
@@ -51,6 +50,9 @@ public class CommandController {
             throw e;
         }
     }
+
+    // JSON commands:
+    // {"command":"config","args":{"ssid":"wekast","password":"87654321"}}
 
     Answer processTask(String task) {
         try {

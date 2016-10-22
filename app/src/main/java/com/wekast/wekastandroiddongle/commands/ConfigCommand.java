@@ -3,7 +3,6 @@ package com.wekast.wekastandroiddongle.commands;
 import com.wekast.wekastandroiddongle.controllers.CommandController;
 import com.wekast.wekastandroiddongle.controllers.WifiController;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,15 +25,15 @@ public class ConfigCommand implements ICommand {
     public Answer execute() {
         WifiController wifiController = controller.getService().getWifiController();
         wifiController.saveWifiConfig(ssid, password);
-        // TODO switch state of wifi
+        wifiController.startConnection();
         wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
         return new ConfigAnswer();
     }
 
-//    {"command":"config","args":{"ssid":"wekastrandom","password":"87654321"}}
     @Override
     public void parseArgs(JSONObject jsonObject) throws JSONException {
         ssid = jsonObject.getString("ssid");
         password = jsonObject.getString("password");
     }
+
 }

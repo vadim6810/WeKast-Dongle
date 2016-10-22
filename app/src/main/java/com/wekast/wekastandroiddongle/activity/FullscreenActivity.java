@@ -1,6 +1,5 @@
 package com.wekast.wekastandroiddongle.activity;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -67,4 +66,5 @@ public class FullscreenActivity extends AppCompatActivity {
         serviceStatus = false;
         stopService(new Intent(this, DongleService.class));
     }
+
 }

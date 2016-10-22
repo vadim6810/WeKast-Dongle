@@ -3,20 +3,17 @@ package com.wekast.wekastandroiddongle.controllers;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 import com.wekast.wekastandroiddongle.Utils.Utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  * Created by ELAD on 10/14/2016.
  */
 
 public class WifiController {
-
 
     private static final String AP_SSID_KEY = "ACCESS_POINT_SSID_ON_APP";
     private static final String AP_PASS_KEY = "ACCESS_POINT_PASS_ON_APP";
@@ -72,7 +69,6 @@ public class WifiController {
         }
         return false;
     }
-
 
     static {
         // lookup methods and fields not defined publicly in the SDK.
@@ -137,7 +133,7 @@ public class WifiController {
         return isWifiApEnabled(wifiManager) || setWifiApEnabled(wifiManager, configureWifi(), true);
     }
 
-    private boolean stopAP() {
+    public boolean stopAP() {
         return setWifiApEnabled(wifiManager, oldConfig, false);
     }
 
@@ -147,14 +143,21 @@ public class WifiController {
      * @return
      */
     public boolean startConnection() {
+        stopAP();
         wifiManager.setWifiEnabled(true);
+        // wait wifi module loading
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         String curSsid = Utils.getFieldSP(context,AP_SSID_KEY);
         String curPass = Utils.getFieldSP(context,AP_PASS_KEY);
         WifiConfiguration wifiConfig = configureWifi(curSsid, curPass);
 
         int networkId = wifiManager.addNetwork(wifiConfig);
         if (networkId < 0) {
-            return false;
+            throw new RuntimeException("coudn't add network " + curSsid);
         }
         wifiManager.disconnect();
         wifiManager.enableNetwork(networkId, true);
@@ -182,19 +185,15 @@ public class WifiController {
     }
 
     public void changeState(WifiState wifiState) {
-        //todo in progress
+        //TODO: in progress
         if (wifiState == WifiState.WIFI_STATE_CONNECT) {
-            stopAP();
-            startConnection();
+            // TODO: set curState WIFI_STARE_CONNECTING. check if connection is established set WIFI_STATE_CONNECTED
             curWifiState = WifiState.WIFI_STATE_CONNECT;
         } else if (wifiState == WifiState.WIFI_STATE_AP) {
+            wifiManager.setWifiEnabled(false);
             startAP();
             curWifiState = WifiState.WIFI_STATE_AP;
         }
-//        else if (wifiState == WifiState.WIFI_STATE_OFF) {
-//            stopAP();
-//            curWifiState = WifiState.WIFI_STATE_AP;
-//        }
     }
 
     public enum WifiState {
@@ -202,4 +201,5 @@ public class WifiController {
         WIFI_STATE_AP,
         WIFI_STATE_CONNECT
     }
+
 }

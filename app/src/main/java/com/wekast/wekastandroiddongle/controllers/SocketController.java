@@ -1,12 +1,8 @@
 package com.wekast.wekastandroiddongle.controllers;
 
-
 import android.util.Log;
 
-import com.wekast.wekastandroiddongle.commands.ICommand;
 import com.wekast.wekastandroiddongle.commands.WelcomeAnswer;
-
-import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -71,4 +67,5 @@ public class SocketController {
     public boolean waitForFile() {
         return false;
     }
+
 }
