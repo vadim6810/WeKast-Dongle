@@ -1,4 +1,4 @@
-package com.wekast.wekastandroiddongle.services;
+package com.wekast.wekastandroiddongle.temp.services;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

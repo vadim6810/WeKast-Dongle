@@ -1,4 +1,4 @@
-package com.wekast.wekastandroiddongle.activity;
+package com.wekast.wekastandroiddongle.temp.activity;
 
 import android.app.ActivityManager;
 import android.content.ComponentName;
@@ -13,11 +13,11 @@ import android.util.Log;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Loger;
-import com.wekast.wekastandroiddongle.services.DongleServiceOld;
-import com.wekast.wekastandroiddongle.wifiControllers.ControllerAccessPoint;
-import com.wekast.wekastandroiddongle.wifiControllers.ControllerWifi;
+import com.wekast.wekastandroiddongle.temp.services.DongleServiceOld;
+import com.wekast.wekastandroiddongle.temp.wifiControllers.ControllerAccessPoint;
+import com.wekast.wekastandroiddongle.temp.wifiControllers.ControllerWifi;
 import com.wekast.wekastandroiddongle.Utils.Utils;
-import com.wekast.wekastandroiddongle.models.DongleAccessPoint;
+import com.wekast.wekastandroiddongle.temp.models.DongleAccessPoint;
 
 /**
  * Explanations
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isServiceRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
-            if("com.wekast.wekastandroiddongle.services.DongleServiceOld".equals(service.service.getClassName())) {
+            if("com.wekast.wekastandroiddongle.temp.services.DongleServiceOld".equals(service.service.getClassName())) {
                 return true;
             }
         }

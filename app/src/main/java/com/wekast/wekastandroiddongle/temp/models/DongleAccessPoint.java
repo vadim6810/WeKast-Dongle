@@ -1,4 +1,4 @@
-package com.wekast.wekastandroiddongle.models;
+package com.wekast.wekastandroiddongle.temp.models;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,8 +10,8 @@ import android.util.Log;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Loger;
-import com.wekast.wekastandroiddongle.wifiControllers.ControllerAccessPoint;
-import com.wekast.wekastandroiddongle.wifiControllers.ControllerWifi;
+import com.wekast.wekastandroiddongle.temp.wifiControllers.ControllerAccessPoint;
+import com.wekast.wekastandroiddongle.temp.wifiControllers.ControllerWifi;
 
 /**
  * Created by ELAD on 8/20/2016.
