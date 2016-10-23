@@ -6,7 +6,9 @@ import android.widget.TextView;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.activity.FullscreenActivity;
-import com.wekast.wekastandroiddongle.commands.WelcomeAnswer;
+import com.wekast.wekastandroiddongle.commands.Answer;
+import com.wekast.wekastandroiddongle.commands.ConfigCommand;
+import com.wekast.wekastandroiddongle.commands.ICommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +19,6 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class SocketController {
 
@@ -44,30 +45,46 @@ public class SocketController {
                 OutputStream outputStream = socket.getOutputStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
                 PrintWriter printWriter = new PrintWriter(outputStream, true);
-                WelcomeAnswer answer = new WelcomeAnswer();
-                printWriter.println(answer);
-                logToTextView("Sended answer", answer.toString());
-                while (true) {
+//                WelcomeAnswer answer = new WelcomeAnswer();
+//                printWriter.println(answer);
+//                logToTextView("Sended answer", answer.toString());
+//                while (true) {
                     String task = br.readLine();
                     if (task == null || task.equals("")) {
                         socket.close();
                         break;
                     }
                     logToTextView("Received task", task);
-                    commandController.processTask(task);
-                    // TODO: if task is reconfig answer2 can't send becouse new connection established
-//                    Answer answer2 = commandController.processTask(task);
-//                    printWriter.println(answer2);
-//                    logToTextView("Sended answer", answer2.toString());
+
+                    Answer answer = commandController.processTask(task);
+                    printWriter.println(answer);
+                    logToTextView("Sended answer", answer.toString());
+
+                    ICommand icommand = commandController.parseCommand(task);
+                    String curCommand = icommand.getCommand();
+                    if (curCommand.equals("config")) {
+                        ConfigCommand configCommand = (ConfigCommand) icommand;
+                        String ssid = configCommand.getSsid();
+                        String password = configCommand.getPassword();
+                        WifiController wifiController = commandController.getService().getWifiController();
+                        wifiController.saveWifiConfig(ssid, password);
+                        wifiController.startConnection();
+                        wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
+                    }
+                    int jj = 0;
+                    if (curCommand.equals("file")) {
+                        jj = 1;
+                    }
+
                     if (Thread.interrupted()) {
                         return;
                     }
-                }
+
+                    socket.close();
+//                }
             }
-        } catch (SocketException e) {
+        } catch (Exception e) {
             Log.i(TAG, "Socket closed: interrupting");
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

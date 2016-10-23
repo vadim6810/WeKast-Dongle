@@ -5,17 +5,24 @@ import android.util.Log;
 import com.wekast.wekastandroiddongle.commands.Answer;
 import com.wekast.wekastandroiddongle.commands.ConfigCommand;
 import com.wekast.wekastandroiddongle.commands.ErrorAnswer;
+import com.wekast.wekastandroiddongle.commands.FileCommand;
 import com.wekast.wekastandroiddongle.commands.ICommand;
 import com.wekast.wekastandroiddongle.services.DongleService;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * JSON commands:
+ * Request from client to dongle with new ssid and pass
+ * {"command":"config","args":{"ssid":"wekast","password":"87654321"}}
+ * Request from client to dongle that want to send file
+ * {"command":"file"}
+ * Response from dongle on command file with socket port for transfer file
+ * {"port":"9999","message":"ok","type":"file","device":"dongle"}
+ *
  * Created by ELAD on 10/15/2016.
  */
-
 public class CommandController {
 
     public static final String TAG = "Dongle";
@@ -29,7 +36,7 @@ public class CommandController {
         this.service = service;
     }
 
-    private ICommand parseCommand(String commandStr) throws Exception {
+    public ICommand parseCommand(String commandStr) throws Exception {
         ICommand command;
         try {
             JSONObject jsonRootObject = new JSONObject(commandStr);
@@ -37,12 +44,15 @@ public class CommandController {
             switch (commandName) {
                 case "config":
                     command = new ConfigCommand(this);
+                    command.parseArgs(jsonRootObject.getJSONObject("args"));
+                    break;
+                case "file":
+                    command = new FileCommand(this);
                     break;
                 default:
                     // TODO: make self class exception
                     throw new Exception("Unknown command");
             }
-            command.parseArgs(jsonRootObject.getJSONObject("args"));
             return command;
         } catch (JSONException e) {
             // TODO throw exception
@@ -50,9 +60,6 @@ public class CommandController {
             throw e;
         }
     }
-
-    // JSON commands:
-    // {"command":"config","args":{"ssid":"wekast","password":"87654321"}}
 
     Answer processTask(String task) {
         try {
@@ -63,4 +70,5 @@ public class CommandController {
             return new ErrorAnswer(e);
         }
     }
+
 }
