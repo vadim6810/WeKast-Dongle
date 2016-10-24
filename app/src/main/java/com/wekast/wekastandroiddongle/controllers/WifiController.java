@@ -153,6 +153,9 @@ public class WifiController {
      * @return
      */
     public boolean startConnection() {
+        // think where to put
+//        wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
+
         stopAP();
         wifiManager.setWifiEnabled(true);
         // wait wifi module loading

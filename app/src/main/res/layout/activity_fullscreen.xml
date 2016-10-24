@@ -46,9 +46,11 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/logger"
-        android:layout_width="match_parent"
-        android:layout_height="269dp"
-        android:textColor="@android:color/black" />
+            android:id="@+id/logger"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@android:color/black"
+            android:scrollbars = "vertical"
+            android:gravity="bottom" />
 
 </FrameLayout>

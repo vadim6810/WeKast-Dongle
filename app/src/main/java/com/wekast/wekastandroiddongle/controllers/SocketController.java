@@ -48,7 +48,7 @@ public class SocketController {
 //                WelcomeAnswer answer = new WelcomeAnswer();
 //                printWriter.println(answer);
 //                logToTextView("Sended answer", answer.toString());
-//                while (true) {
+                while (true) {
                     String task = br.readLine();
                     if (task == null || task.equals("")) {
                         socket.close();
@@ -60,7 +60,14 @@ public class SocketController {
                     printWriter.println(answer);
                     logToTextView("Sended answer", answer.toString());
 
-                    ICommand icommand = commandController.parseCommand(task);
+                    ICommand icommand = null;
+                    try {
+                        icommand = commandController.parseCommand(task);
+                    } catch (Exception e) {
+                        logToTextView("ERROR", "Unknown TASK");
+                        break;
+                    }
+
                     String curCommand = icommand.getCommand();
                     if (curCommand.equals("config")) {
                         ConfigCommand configCommand = (ConfigCommand) icommand;
@@ -68,20 +75,25 @@ public class SocketController {
                         String password = configCommand.getPassword();
                         WifiController wifiController = commandController.getService().getWifiController();
                         wifiController.saveWifiConfig(ssid, password);
-                        wifiController.startConnection();
-                        wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
+                        try {
+                            wifiController.startConnection();
+                        } catch (Exception e) {
+                            Log.i(TAG, "Socket closed: interrupting");
+                        }
+//                        wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
                     }
                     int jj = 0;
                     if (curCommand.equals("file")) {
                         jj = 1;
                     }
+                    if (curCommand.equals("slide")) {
+                        jj = 2;
+                    }
 
                     if (Thread.interrupted()) {
                         return;
                     }
-
-                    socket.close();
-//                }
+                }
             }
         } catch (Exception e) {
             Log.i(TAG, "Socket closed: interrupting");

@@ -7,6 +7,7 @@ import com.wekast.wekastandroiddongle.commands.ConfigCommand;
 import com.wekast.wekastandroiddongle.commands.ErrorAnswer;
 import com.wekast.wekastandroiddongle.commands.FileCommand;
 import com.wekast.wekastandroiddongle.commands.ICommand;
+import com.wekast.wekastandroiddongle.commands.SlideCommand;
 import com.wekast.wekastandroiddongle.services.DongleService;
 
 import org.json.JSONException;
@@ -18,8 +19,12 @@ import org.json.JSONObject;
  * {"command":"config","args":{"ssid":"wekast","password":"87654321"}}
  * Request from client to dongle that want to send file
  * {"command":"file"}
- * Response from dongle on command file with socket port for transfer file
+ * Response from dongle on command "file" with socket port for transfer file
  * {"port":"9999","message":"ok","type":"file","device":"dongle"}
+ * Request from client to dongle to view slide on dongle
+ * {"command":"slide","args":{"slide":"1"}}
+ * Response from dongle on command "slide"
+ * {"message":"ok","type":"slide","device":"dongle"}
  *
  * Created by ELAD on 10/15/2016.
  */
@@ -48,6 +53,9 @@ public class CommandController {
                     break;
                 case "file":
                     command = new FileCommand(this);
+                    break;
+                case "slide":
+                    command = new SlideCommand(this);
                     break;
                 default:
                     // TODO: make self class exception
