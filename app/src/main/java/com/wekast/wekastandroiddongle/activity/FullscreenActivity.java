@@ -72,12 +72,10 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void startDongleService() {
-//        serviceStatus = true;
         startService(new Intent(this, DongleService.class));
     }
 
     private void stopDongleService() {
-//        serviceStatus = false;
         stopService(new Intent(this, DongleService.class));
     }
 

@@ -2,7 +2,6 @@ package com.wekast.wekastandroiddongle.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
@@ -33,11 +32,15 @@ public class Utils {
     public static final int RESULT_SUCCESS = 0;
     public static final int RESULT_ERROR = -1;
     public static final String SHAREDPREFERNCE = "WeKastPreference";
-    public static final String DEFAULT_PATH_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath() + "/";
-    public static final String WORK_DIRECTORY = "WeKast/";
+//    public static final String DEFAULT_PATH_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath() + "/";
+    public static final String DEFAULT_PATH_DIRECTORY = "/sdcard/";
+    public static final String WORK_DIRECTORY = "WekastDongle/";
     public static final String CASH_DIRECTORY = "Cash/";
     public static final File DIRECTORY = new File(DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY);
     public static final String CASH_ABSOLUTE_PATH = DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY + CASH_DIRECTORY;
+
+    public static final String DONGLE_SOCKET_PORT = "8888";
+    public static final String DONGLE_SOCKET_PORT_FILE_TRANSFER = "9999";
 
     // SharedPreferences keys
     // WIFI_STATE_BEFORE_LAUNCH_APP             // save state of wifi module
@@ -45,13 +48,42 @@ public class Utils {
     // ACCESS_POINT_SSID_ON_APP         // loaded value when first time connected application to dongle
     // ACCESS_POINT_PASS_ON_APP         // loaded value when first time connected application to dongle
 
-
     public static void initWorkFolder() {
-        File file = new File(DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY);
-        if (!file.isDirectory()) {
-            file.mkdir();
-            Log.d("Create directory", DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY);
+        ArrayList<String> workFolder = new ArrayList<>();
+        workFolder.add(DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY);
+        workFolder.add(CASH_ABSOLUTE_PATH);
+        workFolder.add(CASH_ABSOLUTE_PATH + "animations");
+        workFolder.add(CASH_ABSOLUTE_PATH + "audio");
+        workFolder.add(CASH_ABSOLUTE_PATH + "slides");
+        workFolder.add(CASH_ABSOLUTE_PATH + "video");
+        createFolder(workFolder);
+    }
+
+    private static void createFolder(ArrayList<String> workFolder) {
+        for (String str: workFolder) {
+            File file = new File(str);
+            if (!file.isDirectory()) {
+                file.mkdir();
+                Log.d("Create directory", str);
+            }
         }
+    }
+
+    public static void clearWorkDirectory(){
+        File[] clearWorkDirectory = (new File(DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY + CASH_DIRECTORY)).listFiles();
+        for (File tmp : clearWorkDirectory) {
+            clearDirectory(tmp);
+        }
+    }
+
+    private static void clearDirectory(File file) {
+        if (!file.exists())
+            return;
+        if(file.isDirectory()){
+            for (File tmp2: file.listFiles()) {
+                clearDirectory(tmp2);
+            }
+        } else file.delete();
     }
 
     public static boolean getContainsSP(Context context, String field) {
@@ -126,10 +158,10 @@ public class Utils {
         return arrayList;
     }
 
-    public static boolean unZipPresentation(String path) {
+    public static boolean unZipPresentation(String pathFile) {
         boolean res = false;
         try {
-            ZipInputStream zin = new ZipInputStream(new FileInputStream(path));
+            ZipInputStream zin = new ZipInputStream(new FileInputStream(pathFile));
             ZipEntry zipEntry = null;
             File targetDirectory = new File(CASH_ABSOLUTE_PATH);
             while ((zipEntry = zin.getNextEntry()) != null) {
@@ -172,4 +204,5 @@ public class Utils {
         }
         return jsonObject;
     }
+
 }

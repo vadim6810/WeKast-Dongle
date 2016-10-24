@@ -12,6 +12,7 @@ import org.json.JSONObject;
 public class FileCommand implements ICommand {
 
     private CommandController controller;
+    private String fileSize;
 
     public FileCommand(CommandController controller) {
         this.controller = controller;
@@ -23,12 +24,17 @@ public class FileCommand implements ICommand {
     }
 
     @Override
-    public void parseArgs(JSONObject args) throws JSONException {
-
+    public void parseArgs(JSONObject jsonObject) throws JSONException {
+        fileSize = jsonObject.getString("fileSize");
     }
 
     @Override
     public String getCommand() {
         return "file";
     }
+
+    public String getFileSize() {
+        return fileSize;
+    }
+
 }
