@@ -32,4 +32,8 @@ public class SlideCommand implements ICommand {
     public String getCommand() {
         return "slide";
     }
+
+    public String getSlide() {
+        return slide;
+    }
 }

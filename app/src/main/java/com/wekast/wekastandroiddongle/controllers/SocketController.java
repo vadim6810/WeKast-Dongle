@@ -1,7 +1,12 @@
 package com.wekast.wekastandroiddongle.controllers;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.util.Log;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.wekast.wekastandroiddongle.R;
@@ -9,6 +14,7 @@ import com.wekast.wekastandroiddongle.activity.FullscreenActivity;
 import com.wekast.wekastandroiddongle.commands.Answer;
 import com.wekast.wekastandroiddongle.commands.ConfigCommand;
 import com.wekast.wekastandroiddongle.commands.ICommand;
+import com.wekast.wekastandroiddongle.commands.SlideCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,9 +51,7 @@ public class SocketController {
                 OutputStream outputStream = socket.getOutputStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
                 PrintWriter printWriter = new PrintWriter(outputStream, true);
-//                WelcomeAnswer answer = new WelcomeAnswer();
-//                printWriter.println(answer);
-//                logToTextView("Sended answer", answer.toString());
+
                 while (true) {
                     String task = br.readLine();
                     if (task == null || task.equals("")) {
@@ -68,12 +72,14 @@ public class SocketController {
                         break;
                     }
 
+                    // TODO: switch
                     String curCommand = icommand.getCommand();
                     if (curCommand.equals("config")) {
                         ConfigCommand configCommand = (ConfigCommand) icommand;
                         String ssid = configCommand.getSsid();
                         String password = configCommand.getPassword();
                         WifiController wifiController = commandController.getService().getWifiController();
+
                         wifiController.saveWifiConfig(ssid, password);
                         try {
                             wifiController.startConnection();
@@ -82,12 +88,14 @@ public class SocketController {
                         }
 //                        wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
                     }
-                    int jj = 0;
+
                     if (curCommand.equals("file")) {
-                        jj = 1;
                     }
+
                     if (curCommand.equals("slide")) {
-                        jj = 2;
+                        SlideCommand slideCommand = (SlideCommand) icommand;
+                        String curSlide = slideCommand.getSlide();
+                        showSlideOnDongle(curSlide);
                     }
 
                     if (Thread.interrupted()) {
@@ -114,6 +122,30 @@ public class SocketController {
             @Override
             public void run() {
                 textView.append(message + ": " + variable + "\n");
+            }
+        });
+    }
+
+    private void showSlideOnDongle(final String curSlide) {
+        // TODO: getPath from variables or get path by device also from variables
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                FrameLayout logoFrame = (FrameLayout) mainActivity.findViewById(R.id.logoFrame);
+                logoFrame.setBackgroundColor(Color.rgb(0, 0, 0));
+
+                // TODO: define device (dongle or test phone)
+                Bitmap bmp = null;
+//                File f = new File(Environment.getExternalStorageDirectory() + "/sdcard/wekastdongle/cash/slides/");
+//                if(f.isDirectory()) {
+                    bmp = BitmapFactory.decodeFile("/sdcard/wekastdongle/cash/slides/" + curSlide + ".jpg");
+//                }
+//                f = new File(Environment.getExternalStorageDirectory() + "/storage/sdcard0/WeKast/cash/slides/");
+//                if(f.isDirectory()) {
+//                    bmp = BitmapFactory.decodeFile("/storage/sdcard0/WeKast/cash/slides/" + curSlide + ".jpg");
+//                }
+                ImageView img = (ImageView) mainActivity.findViewById(R.id.slideIMG);
+                img.setImageBitmap(bmp);
             }
         });
     }

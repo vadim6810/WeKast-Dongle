@@ -56,6 +56,7 @@ public class CommandController {
                     break;
                 case "slide":
                     command = new SlideCommand(this);
+                    command.parseArgs(jsonRootObject.getJSONObject("args"));
                     break;
                 default:
                     // TODO: make self class exception

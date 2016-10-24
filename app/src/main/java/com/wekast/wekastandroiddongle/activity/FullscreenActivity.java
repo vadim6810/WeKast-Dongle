@@ -8,18 +8,18 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.services.DongleService;
 
 /**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
+ * Created by ELAD on 10/23/2016.
  */
 public class FullscreenActivity extends AppCompatActivity {
 
-    private boolean serviceStatus = false;
     private static Context context;
     private static Activity activity;
     private TextView textView;
@@ -35,36 +35,24 @@ public class FullscreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // FULLSCREEN
+        getSupportActionBar().hide();       // hide action bar
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
+
         FullscreenActivity.context = getApplicationContext();
         FullscreenActivity.activity = this;
         setContentView(R.layout.activity_fullscreen);
-
-//        Button button = (Button) findViewById(R.id.dummy_button);
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (serviceStatus) {
-//                    stopDongleService();
-//                } else {
-//                    startDongleService();
-//                }
-//            }
-//        });
 
         if (requestSettingsPermissions()) {
             startDongleService();
         }
 
-        // add scroll to logger textView
         textView = (TextView) findViewById(R.id.logger);
         textView.setMovementMethod(new ScrollingMovementMethod());
-
-        // test textView with scroll
-//        String s = "";
-//        for (int i = 0; i < 100; i++) {
-//            s+= "line " + i + "\n";
-//        }
-//        textView.append(s);
     }
 
     @Override
