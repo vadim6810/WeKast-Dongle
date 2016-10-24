@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.wekast.wekastandroiddongle.R;
@@ -24,7 +23,6 @@ public class FullscreenActivity extends AppCompatActivity {
     private static Context context;
     private static Activity activity;
     private TextView textView;
-    private ScrollView scrollView;
 
     public static Context getAppContext() {
         return FullscreenActivity.context;
@@ -62,11 +60,11 @@ public class FullscreenActivity extends AppCompatActivity {
         textView.setMovementMethod(new ScrollingMovementMethod());
 
         // test textView with scroll
-        String s = "";
-        for (int i = 0; i < 100; i++) {
-            s+= "line " + i + "\n";
-        }
-        textView.append(s);
+//        String s = "";
+//        for (int i = 0; i < 100; i++) {
+//            s+= "line " + i + "\n";
+//        }
+//        textView.append(s);
     }
 
     @Override
