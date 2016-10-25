@@ -145,13 +145,19 @@ public class SocketController {
             bytesRead = is.read(mybytearray,0,mybytearray.length);
             current = bytesRead;
 
+//            int bytesReadTotal = 0;
+//            boolean readedAllBytes = false;
             do {
                 bytesRead =
                         is.read(mybytearray, current, (mybytearray.length-current));
 //                if(bytesRead >= 0)
+//                bytesReadTotal += bytesRead;
                 if(bytesRead > 0)
                     current += bytesRead;
+//                if(bytesReadTotal == Integer.valueOf(fileSize))
+//                    readedAllBytes = true;
             } while(bytesRead > 0);
+//            } while(!readedAllBytes);
 //        } while(bytesRead > -1);
 
             bos.write(mybytearray, 0 , current);
@@ -179,7 +185,7 @@ public class SocketController {
         }
 
         // TODO: move path to constants
-//        Utils.initWorkFolder();
+        Utils.initWorkFolder();
         Utils.clearWorkDirectory();
         Utils.unZipPresentation("/sdcard/wekastdongle/presentation.ezs");
     }
