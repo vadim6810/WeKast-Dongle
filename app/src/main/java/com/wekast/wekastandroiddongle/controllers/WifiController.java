@@ -158,9 +158,9 @@ public class WifiController {
 
         stopAP();
         wifiManager.setWifiEnabled(true);
-        // wait wifi module loading
+        // TODO: wait wifi module loading
         try {
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -177,6 +177,8 @@ public class WifiController {
         wifiManager.reconnect();
 
         logToTextView("Connected to", curSsid);
+
+        // TODO: check if connection established
         return true;
     }
 
@@ -196,6 +198,7 @@ public class WifiController {
         }
         wifiManager.setWifiEnabled(wifiEnabled);
         setWifiApConfiguration(wifiManager, oldConfig);
+//        stopAP();
     }
 
     public void changeState(WifiState wifiState) {

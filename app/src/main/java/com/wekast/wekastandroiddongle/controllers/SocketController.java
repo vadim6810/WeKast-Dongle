@@ -70,6 +70,7 @@ public class SocketController {
                     }
                     logToTextView("Received task", task);
 
+
                     // TODO: move answer after commands
                     Answer answer = commandController.processTask(task);
                     printWriter.println(answer);
@@ -124,6 +125,8 @@ public class SocketController {
     public void close() throws IOException {
         if (!serverSocket.isClosed())
             serverSocket.close();
+        if (!serverSocketFile.isClosed())
+            serverSocketFile.close();
     }
 
     public void waitForFile(String fileSize) {

@@ -60,6 +60,11 @@ public class FullscreenActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    protected void onDestroy() {
+        super.onDestroy();
+        stopDongleService();
+    }
+
     private boolean requestSettingsPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.System.canWrite(this)) {
