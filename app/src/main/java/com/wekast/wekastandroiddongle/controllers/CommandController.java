@@ -22,7 +22,7 @@ import org.json.JSONObject;
  * Response from dongle on command "file" with socket port for transfer file
  * {"port":"9999","message":"ok","type":"file","device":"dongle"}
  * Request from client to dongle to view slide on dongle
- * {"command":"slide","args":{"slide":"1"}}
+ * {"command":"slide","args":{"slide":"1","animation":"1","video":"","audio":""}}
  * Response from dongle on command "slide"
  * {"message":"ok","type":"slide","device":"dongle"}
  *

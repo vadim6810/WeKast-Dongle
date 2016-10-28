@@ -35,7 +35,9 @@ public class Utils {
 //    public static final String DEFAULT_PATH_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath() + "/";
     public static final String DEFAULT_PATH_DIRECTORY = "/sdcard/";
     public static final String WORK_DIRECTORY = "WekastDongle/";
-    public static final String CASH_DIRECTORY = "Cash/";
+    public static final String APP_PATH = "/sdcard/wekastdongle/";
+    public static final String CASH_DIRECTORY = "cash/";
+//    public static final String SLIDES_DIRECTORY = slides
     public static final File DIRECTORY = new File(DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY);
     public static final String CASH_ABSOLUTE_PATH = DEFAULT_PATH_DIRECTORY + WORK_DIRECTORY + CASH_DIRECTORY;
 

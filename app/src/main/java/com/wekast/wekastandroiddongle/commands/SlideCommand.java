@@ -17,6 +17,9 @@ public class SlideCommand implements ICommand {
     }
 
     private String slide;
+    private String animation;
+    private String video;
+    private String audio;
 
     @Override
     public Answer execute() {
@@ -26,6 +29,9 @@ public class SlideCommand implements ICommand {
     @Override
     public void parseArgs(JSONObject jsonObject) throws JSONException {
         slide = jsonObject.getString("slide");
+        animation = jsonObject.getString("animation");
+        video = jsonObject.getString("video");
+        audio = jsonObject.getString("audio");
     }
 
     @Override
@@ -36,4 +42,17 @@ public class SlideCommand implements ICommand {
     public String getSlide() {
         return slide;
     }
+
+    public String getAnimation() {
+        return animation;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public String getAudio() {
+        return audio;
+    }
+
 }
