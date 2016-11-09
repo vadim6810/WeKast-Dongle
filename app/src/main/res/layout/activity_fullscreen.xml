@@ -37,15 +37,10 @@
         android:scaleType="fitCenter"
         android:visibility="invisible" />
 
-
-
-
-
-
     <TextView
         android:id="@+id/logger"
         android:layout_width="700dp"
-        android:layout_height="200dp"
+        android:layout_height="match_parent"
         android:layout_gravity="bottom|center"
         android:gravity="bottom"
         android:scrollbars="vertical"

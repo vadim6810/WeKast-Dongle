@@ -21,6 +21,7 @@ import android.widget.VideoView;
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.services.DongleService;
+import com.wekast.wekastandroiddongle.services.IsWiFiConnectedService;
 
 /**
  * Created by ELAD on 10/23/2016.
@@ -55,7 +56,7 @@ public class FullscreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_fullscreen);
 
         if (requestSettingsPermissions()) {
-            startDongleService();
+            startService(new Intent(this, DongleService.class));
         }
 
         textView = (TextView) findViewById(R.id.logger);
@@ -64,9 +65,7 @@ public class FullscreenActivity extends AppCompatActivity {
         final Button button = (Button) findViewById(R.id.testButton);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
                 workWithVideo();
-
             }
         });
     }
@@ -118,7 +117,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
     protected void onDestroy() {
         super.onDestroy();
-        stopDongleService();
+        stopService(new Intent(this, DongleService.class));
+        stopService(new Intent(this, IsWiFiConnectedService.class));
     }
 
     private boolean requestSettingsPermissions() {
@@ -130,14 +130,6 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         }
         return true;
-    }
-
-    private void startDongleService() {
-        startService(new Intent(this, DongleService.class));
-    }
-
-    private void stopDongleService() {
-        stopService(new Intent(this, DongleService.class));
     }
 
 }

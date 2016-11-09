@@ -2,13 +2,23 @@ package com.wekast.wekastandroiddongle.controllers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.activity.FullscreenActivity;
+import com.wekast.wekastandroiddongle.services.IsWiFiConnectedService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -135,7 +145,7 @@ public class WifiController {
      *
      * @return
      */
-    private boolean startAP() {
+    public boolean startAP() {
         boolean result = isWifiApEnabled(wifiManager) || setWifiApEnabled(wifiManager, configureWifi(), true);
         logToTextView("Accesss Point started", String.valueOf(result));
         return result;
@@ -178,6 +188,8 @@ public class WifiController {
 
         logToTextView("Connected to", curSsid);
 
+        mainActivity.startService(new Intent(mainActivity, IsWiFiConnectedService.class));
+
         // TODO: check if connection established
         return true;
     }
@@ -219,7 +231,7 @@ public class WifiController {
         WIFI_STATE_CONNECT
     }
 
-    private void logToTextView(final String message, final String variable) {
+    public void logToTextView(final String message, final String variable) {
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -228,4 +240,59 @@ public class WifiController {
         });
     }
 
+
+    public boolean isWifiConnected() {
+        // TODO: refactor to less rows
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo == null)
+            return false;
+        WifiInfo info = wifiManager.getConnectionInfo();
+        String curSsid  = info.getSSID();
+        boolean isConnected = networkInfo.isConnected();
+        String curSsidFromSP = Utils.getFieldSP(context, AP_SSID_KEY);
+        int i = 0;
+        if (curSsid.equals("\"" + curSsidFromSP + "\"") && isConnected)
+            return true;
+        return false;
+    }
+
+    public void disableWifi() {
+        wifiManager.setWifiEnabled(false);
+    }
+
+    public void restoreDesktop() {
+
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+
+
+                TextView loggerView = (TextView) mainActivity.findViewById(R.id.logger);
+                FrameLayout logoFrame = (FrameLayout) mainActivity.findViewById(R.id.logoFrame);
+                ImageView slideImgView = (ImageView) mainActivity.findViewById(R.id.slideIMG);
+                VideoView videoView = (VideoView) mainActivity.findViewById(R.id.videoView);
+
+                slideImgView.setVisibility(View.INVISIBLE);
+                videoView.setVisibility(View.INVISIBLE);
+                logoFrame.setBackgroundColor(Color.rgb(255, 255, 255));
+                loggerView.setVisibility(View.VISIBLE);
+
+//                videoView.setVideoPath(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".mp4");
+//                slideImgView.setVisibility(View.INVISIBLE);
+//                videoView.setVisibility(View.VISIBLE);
+//                videoView.start();
+//
+//                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                    @Override
+//                    public void onCompletion(MediaPlayer mp) {
+//                        bmp = BitmapFactory.decodeFile(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".jpg");
+//                        slideImgView.setImageBitmap(bmp);
+//                        slideImgView.setVisibility(View.VISIBLE);
+//                    }
+//                });
+            }
+        });
+    }
 }
