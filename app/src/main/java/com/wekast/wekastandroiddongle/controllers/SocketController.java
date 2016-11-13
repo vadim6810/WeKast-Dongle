@@ -115,12 +115,12 @@ public class SocketController {
                         waitForFile(fileCommand.getFileSize());
                     }
 
-                    if (curCommand.equals("slide")) {
-//                        SlideCommand slideCommand = (SlideCommand) icommand;
-//                        String curSlide = slideCommand.getSlide();
-                        showSlideOnDongle((SlideCommand) icommand);
-//                        showSlideOnDongle(curSlide);
-                    }
+//                    if (curCommand.equals("slide")) {
+////                        SlideCommand slideCommand = (SlideCommand) icommand;
+////                        String curSlide = slideCommand.getSlide();
+//                        showSlideOnDongle((SlideCommand) icommand);
+////                        showSlideOnDongle(curSlide);
+//                    }
 
                     if (Thread.interrupted()) {
                         return;
@@ -212,44 +212,96 @@ public class SocketController {
         });
     }
 
-//    private void showSlideOnDongle(final String curSlide) {
-    private void showSlideOnDongle(SlideCommand slideCommand) {
-        String curSlide = slideCommand.getSlide();
-        String curAnimation = slideCommand.getAnimation();
-//        String curVideo = slideCommand.getVideo();
-//        String curAudio = slideCommand.getAudio();
+////    private void showSlideOnDongle(final String curSlide) {
+//    private void showSlideOnDongle(SlideCommand slideCommand) {
+//        String curSlide = slideCommand.getSlide();
+//        String curAnimation = slideCommand.getAnimation();
+////        String curVideo = slideCommand.getVideo();
+////        String curAudio = slideCommand.getAudio();
+//
+//        restoreBackgroundLogoFrame();
+//
+//        if (curAnimation.equals("")) {
+//            showSlide(curSlide);
+//        } else {
+//            showAnimation(curSlide, curAnimation);
+//            /*if (curVideo.equals("")) {
+//                showVideo();
+//            }*/
+//        }
+//    }
 
-        restoreBackgroundLogoFrame();
+//    private void restoreBackgroundLogoFrame() {
+//        mainActivity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                logoFrame.setBackgroundColor(Color.rgb(0, 0, 0));
+//                loggerView.setVisibility(View.INVISIBLE);
+//            }
+//        });
+//    }
 
-        if (curAnimation.equals("")) {
-            showSlide(curSlide);
-        } else {
-            showAnimation(curSlide, curAnimation);
-            /*if (curVideo.equals("")) {
-                showVideo();
-            }*/
-        }
-    }
+//    private void showSlide(final String curSlide) {
+//        mainActivity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                String curAnimation = "1";
+//                bmp = BitmapFactory.decodeFile(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".jpg");
+//                slideImgView.setImageBitmap(bmp);
+//                slideImgView.setVisibility(View.VISIBLE);
+//
+////                videoView.setVideoPath(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".mp4");
+////                slideImgView.setVisibility(View.INVISIBLE);
+////                videoView.setVisibility(View.VISIBLE);
+////                videoView.start();
+////
+////                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+////                    @Override
+////                    public void onCompletion(MediaPlayer mp) {
+////                        bmp = BitmapFactory.decodeFile(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".jpg");
+////                        slideImgView.setImageBitmap(bmp);
+////                        slideImgView.setVisibility(View.VISIBLE);
+////                    }
+////                });
+//
+//
+//
+//
+////                final VideoView animation = (VideoView) mainActivity.findViewById(R.id.slideAnim);
+////                animation.setVideoPath(APP_PATH + "cash/animations/slide" + curSlide + "animation" + curSlide + ".mp4");
+////                animation.setMediaController(new MediaController(mainActivity));
+////                animation.setEnabled(true);
+////                animation.requestFocus(0);
+////                animation.start();
+//
+////                animation.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+////                    @Override
+////                    public void onCompletion(MediaPlayer mp) {
+////                        animation.setEnabled(false);
+////                    }
+////                });
+//
+//
+////                // TODO: define device (dongle or test phone)
+//////                Bitmap bmp = null;
+//////                File f = new File(Environment.getExternalStorageDirectory() + "/sdcard/wekastdongle/cash/slides/");
+//////                if(f.isDirectory()) {
+////                bmp = BitmapFactory.decodeFile(APP_PATH + "cash/slides/" + curSlide + ".jpg");
+//////                }
+//////                f = new File(Environment.getExternalStorageDirectory() + "/storage/sdcard0/WeKast/cash/slides/");
+//////                if(f.isDirectory()) {
+//////                    bmp = BitmapFactory.decodeFile("/storage/sdcard0/WeKast/cash/slides/" + curSlide + ".jpg");
+//////                }
+////
+////                slideImgView.setImageBitmap(bmp);
+//            }
+//        });
+//    }
 
-    private void restoreBackgroundLogoFrame() {
-        mainActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                logoFrame.setBackgroundColor(Color.rgb(0, 0, 0));
-                loggerView.setVisibility(View.INVISIBLE);
-            }
-        });
-    }
-
-    private void showSlide(final String curSlide) {
-        mainActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                String curAnimation = "1";
-                bmp = BitmapFactory.decodeFile(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".jpg");
-                slideImgView.setImageBitmap(bmp);
-                slideImgView.setVisibility(View.VISIBLE);
-
+//    private void showAnimation(final String curSlide, final String curAnimation) {
+//        mainActivity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
 //                videoView.setVideoPath(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".mp4");
 //                slideImgView.setVisibility(View.INVISIBLE);
 //                videoView.setVisibility(View.VISIBLE);
@@ -263,60 +315,8 @@ public class SocketController {
 //                        slideImgView.setVisibility(View.VISIBLE);
 //                    }
 //                });
-
-
-
-
-//                final VideoView animation = (VideoView) mainActivity.findViewById(R.id.slideAnim);
-//                animation.setVideoPath(APP_PATH + "cash/animations/slide" + curSlide + "animation" + curSlide + ".mp4");
-//                animation.setMediaController(new MediaController(mainActivity));
-//                animation.setEnabled(true);
-//                animation.requestFocus(0);
-//                animation.start();
-
-//                animation.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                    @Override
-//                    public void onCompletion(MediaPlayer mp) {
-//                        animation.setEnabled(false);
-//                    }
-//                });
-
-
-//                // TODO: define device (dongle or test phone)
-////                Bitmap bmp = null;
-////                File f = new File(Environment.getExternalStorageDirectory() + "/sdcard/wekastdongle/cash/slides/");
-////                if(f.isDirectory()) {
-//                bmp = BitmapFactory.decodeFile(APP_PATH + "cash/slides/" + curSlide + ".jpg");
-////                }
-////                f = new File(Environment.getExternalStorageDirectory() + "/storage/sdcard0/WeKast/cash/slides/");
-////                if(f.isDirectory()) {
-////                    bmp = BitmapFactory.decodeFile("/storage/sdcard0/WeKast/cash/slides/" + curSlide + ".jpg");
-////                }
-//
-//                slideImgView.setImageBitmap(bmp);
-            }
-        });
-    }
-
-    private void showAnimation(final String curSlide, final String curAnimation) {
-        mainActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                videoView.setVideoPath(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".mp4");
-                slideImgView.setVisibility(View.INVISIBLE);
-                videoView.setVisibility(View.VISIBLE);
-                videoView.start();
-
-                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        bmp = BitmapFactory.decodeFile(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".jpg");
-                        slideImgView.setImageBitmap(bmp);
-                        slideImgView.setVisibility(View.VISIBLE);
-                    }
-                });
-            }
-        });
-    }
+//            }
+//        });
+//    }
 
 }

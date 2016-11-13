@@ -3,6 +3,7 @@ package com.wekast.wekastandroiddongle.controllers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -19,6 +20,7 @@ import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.activity.FullscreenActivity;
 import com.wekast.wekastandroiddongle.services.IsWiFiConnectedService;
+import com.wekast.wekastandroiddongle.services.WifiConnected;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -186,8 +188,9 @@ public class WifiController {
         wifiManager.enableNetwork(networkId, true);
         wifiManager.reconnect();
 
-        logToTextView("Connected to", curSsid);
-
+        logToTextView("try to connect to ", curSsid);
+        WifiConnected receiver = new WifiConnected();
+        context.registerReceiver(receiver, new IntentFilter());
         mainActivity.startService(new Intent(mainActivity, IsWiFiConnectedService.class));
 
         // TODO: check if connection established

@@ -23,6 +23,8 @@ public class SlideCommand implements ICommand {
 
     @Override
     public Answer execute() {
+        // show slide
+        controller.getService().showSlide(slide, animation);
         return new SlideAnswer();
     }
 

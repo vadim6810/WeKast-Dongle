@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- without WAKE_LOCK application crashed on startup on dongle CHECK maybe not need now-->
+    <!-- without WAKE_LOCK application crashed on startup on dongle CHECK maybe not need now -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
@@ -32,13 +32,13 @@
             </intent-filter>
         </activity>
 
-        <!--<receiver-->
-            <!--android:name=".services.StartBroadcastReceiver"-->
-            <!--android:permission="android.permission.RECEIVE_BOOT_COMPLETED">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
+        <!-- <receiver -->
+        <!-- android:name=".services.StartBroadcastReceiver" -->
+        <!-- android:permission="android.permission.RECEIVE_BOOT_COMPLETED"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.BOOT_COMPLETED" /> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
 
 
         <!--
@@ -52,15 +52,24 @@
         </receiver
         -->
 
-
         <service
             android:name=".services.DongleService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
         <service
             android:name=".services.IsWiFiConnectedService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <receiver
+            android:name=".services.WifiConnected"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+                <action android:name="android.net.wifi.STATE_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

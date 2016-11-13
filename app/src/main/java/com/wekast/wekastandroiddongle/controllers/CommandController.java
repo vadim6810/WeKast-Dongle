@@ -8,6 +8,7 @@ import com.wekast.wekastandroiddongle.commands.ErrorAnswer;
 import com.wekast.wekastandroiddongle.commands.FileCommand;
 import com.wekast.wekastandroiddongle.commands.ICommand;
 import com.wekast.wekastandroiddongle.commands.SlideCommand;
+import com.wekast.wekastandroiddongle.commands.StopCommand;
 import com.wekast.wekastandroiddongle.services.DongleService;
 
 import org.json.JSONException;
@@ -25,6 +26,8 @@ import org.json.JSONObject;
  * {"command":"slide","args":{"slide":"1","animation":"1","video":"","audio":""}}
  * Response from dongle on command "slide"
  * {"message":"ok","type":"slide","device":"dongle"}
+ * Request from client to dongle to stop showing presentation
+ * {"command":"stop"}
  *
  * Created by ELAD on 10/15/2016.
  */
@@ -49,18 +52,24 @@ public class CommandController {
             switch (commandName) {
                 case "config":
                     command = new ConfigCommand(this);
+                    command.parseArgs(jsonRootObject.getJSONObject("args"));
                     break;
                 case "file":
                     command = new FileCommand(this);
+                    command.parseArgs(jsonRootObject.getJSONObject("args"));
                     break;
                 case "slide":
                     command = new SlideCommand(this);
+                    command.parseArgs(jsonRootObject.getJSONObject("args"));
+                    break;
+                case "stop":
+                    command = new StopCommand(this);
                     break;
                 default:
                     // TODO: make self class exception
                     throw new Exception("Unknown command");
             }
-            command.parseArgs(jsonRootObject.getJSONObject("args"));
+//            command.parseArgs(jsonRootObject.getJSONObject("args"));
             return command;
         } catch (JSONException e) {
             // TODO throw exception

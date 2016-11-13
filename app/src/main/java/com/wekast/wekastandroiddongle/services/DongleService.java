@@ -3,6 +3,7 @@ package com.wekast.wekastandroiddongle.services;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.wekast.wekastandroiddongle.controllers.CommandController;
@@ -29,6 +30,21 @@ public class DongleService extends Service {
 
     public CommandController getCommandController() {
         return commandController;
+    }
+
+    public void showSlide(String slide, String animation) {
+        Intent intent = new Intent("INTENT_FILTER_NAME");
+        intent.putExtra("command", "slide");
+        intent.putExtra("slide", slide);
+        intent.putExtra("animation", animation);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+    }
+
+    public void stopPresentation() {
+        Intent intent = new Intent("INTENT_FILTER_NAME");
+        intent.putExtra("command", "stop");
+        intent.putExtra("stop", "1");
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
     class ServiceThread extends Thread {
@@ -93,5 +109,7 @@ public class DongleService extends Service {
             super.onDestroy();
         }
     }
+
+
 
 }
