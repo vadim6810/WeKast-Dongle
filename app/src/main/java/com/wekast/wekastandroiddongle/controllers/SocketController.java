@@ -46,10 +46,6 @@ public class SocketController {
 
     private Activity mainActivity = FullscreenActivity.getMainActivity();
     private TextView loggerView = (TextView) mainActivity.findViewById(R.id.logger);
-    private FrameLayout logoFrame = (FrameLayout) mainActivity.findViewById(R.id.logoFrame);
-    private ImageView slideImgView = (ImageView) mainActivity.findViewById(R.id.slideIMG);
-    private VideoView videoView = (VideoView) mainActivity.findViewById(R.id.videoView);
-    private Bitmap bmp;
 
     public SocketController(CommandController commandController) throws IOException {
         this.commandController = commandController;
@@ -57,7 +53,6 @@ public class SocketController {
         int portFile = 9999;
         serverSocket = new ServerSocket(port);
         serverSocketFile = new ServerSocket(portFile);
-//        videoView.setMediaController(new MediaController(mainActivity));
     }
 
     public void waitForTask() {
@@ -79,7 +74,6 @@ public class SocketController {
                     }
                     logToTextView("Received task", task);
 
-
                     // TODO: move answer after commands
                     Answer answer = commandController.processTask(task);
                     printWriter.println(answer);
@@ -95,6 +89,8 @@ public class SocketController {
 
                     // TODO: switch
                     String curCommand = icommand.getCommand();
+
+                    // TODO: move to command config like slide
                     if (curCommand.equals("config")) {
                         ConfigCommand configCommand = (ConfigCommand) icommand;
                         String ssid = configCommand.getSsid();
@@ -110,17 +106,11 @@ public class SocketController {
 //                        wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
                     }
 
+                    // TODO: move to command file like slide
                     if (curCommand.equals("file")) {
                         FileCommand fileCommand = (FileCommand) icommand;
                         waitForFile(fileCommand.getFileSize());
                     }
-
-//                    if (curCommand.equals("slide")) {
-////                        SlideCommand slideCommand = (SlideCommand) icommand;
-////                        String curSlide = slideCommand.getSlide();
-//                        showSlideOnDongle((SlideCommand) icommand);
-////                        showSlideOnDongle(curSlide);
-//                    }
 
                     if (Thread.interrupted()) {
                         return;
@@ -146,41 +136,31 @@ public class SocketController {
         BufferedOutputStream bos = null;
         Socket sock = null;
         try {
-//            sock = new Socket(SERVER, SOCKET_PORT);
             sock = serverSocketFile.accept();
 
             // receive file
             byte [] mybytearray  = new byte [Integer.valueOf(fileSize)];
-//            byte [] mybytearray  = new byte [6822921];              // Pass real from response
             InputStream is = sock.getInputStream();
             fos = new FileOutputStream(APP_PATH + "presentation.ezs");
             bos = new BufferedOutputStream(fos);
             bytesRead = is.read(mybytearray,0,mybytearray.length);
             current = bytesRead;
 
-//            int bytesReadTotal = 0;
-//            boolean readedAllBytes = false;
             do {
                 bytesRead =
                         is.read(mybytearray, current, (mybytearray.length-current));
-//                if(bytesRead >= 0)
-//                bytesReadTotal += bytesRead;
                 if(bytesRead > 0)
                     current += bytesRead;
-//                if(bytesReadTotal == Integer.valueOf(fileSize))
-//                    readedAllBytes = true;
             } while(bytesRead > 0);
-//            } while(!readedAllBytes);
-//        } while(bytesRead > -1);
 
             bos.write(mybytearray, 0 , current);
             bos.flush();
             System.out.println("File " + APP_PATH + "presentation.ezs"
                     + " downloaded (" + current + " bytes read)");
 
-            //RESPONSE FROM THE SERVER
             PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
-            out.println(99); //REPLY DE NUMBER 99
+            // TODO: think what to send in response
+            out.println("response");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -211,112 +191,5 @@ public class SocketController {
             }
         });
     }
-
-////    private void showSlideOnDongle(final String curSlide) {
-//    private void showSlideOnDongle(SlideCommand slideCommand) {
-//        String curSlide = slideCommand.getSlide();
-//        String curAnimation = slideCommand.getAnimation();
-////        String curVideo = slideCommand.getVideo();
-////        String curAudio = slideCommand.getAudio();
-//
-//        restoreBackgroundLogoFrame();
-//
-//        if (curAnimation.equals("")) {
-//            showSlide(curSlide);
-//        } else {
-//            showAnimation(curSlide, curAnimation);
-//            /*if (curVideo.equals("")) {
-//                showVideo();
-//            }*/
-//        }
-//    }
-
-//    private void restoreBackgroundLogoFrame() {
-//        mainActivity.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                logoFrame.setBackgroundColor(Color.rgb(0, 0, 0));
-//                loggerView.setVisibility(View.INVISIBLE);
-//            }
-//        });
-//    }
-
-//    private void showSlide(final String curSlide) {
-//        mainActivity.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                String curAnimation = "1";
-//                bmp = BitmapFactory.decodeFile(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".jpg");
-//                slideImgView.setImageBitmap(bmp);
-//                slideImgView.setVisibility(View.VISIBLE);
-//
-////                videoView.setVideoPath(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".mp4");
-////                slideImgView.setVisibility(View.INVISIBLE);
-////                videoView.setVisibility(View.VISIBLE);
-////                videoView.start();
-////
-////                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-////                    @Override
-////                    public void onCompletion(MediaPlayer mp) {
-////                        bmp = BitmapFactory.decodeFile(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".jpg");
-////                        slideImgView.setImageBitmap(bmp);
-////                        slideImgView.setVisibility(View.VISIBLE);
-////                    }
-////                });
-//
-//
-//
-//
-////                final VideoView animation = (VideoView) mainActivity.findViewById(R.id.slideAnim);
-////                animation.setVideoPath(APP_PATH + "cash/animations/slide" + curSlide + "animation" + curSlide + ".mp4");
-////                animation.setMediaController(new MediaController(mainActivity));
-////                animation.setEnabled(true);
-////                animation.requestFocus(0);
-////                animation.start();
-//
-////                animation.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-////                    @Override
-////                    public void onCompletion(MediaPlayer mp) {
-////                        animation.setEnabled(false);
-////                    }
-////                });
-//
-//
-////                // TODO: define device (dongle or test phone)
-//////                Bitmap bmp = null;
-//////                File f = new File(Environment.getExternalStorageDirectory() + "/sdcard/wekastdongle/cash/slides/");
-//////                if(f.isDirectory()) {
-////                bmp = BitmapFactory.decodeFile(APP_PATH + "cash/slides/" + curSlide + ".jpg");
-//////                }
-//////                f = new File(Environment.getExternalStorageDirectory() + "/storage/sdcard0/WeKast/cash/slides/");
-//////                if(f.isDirectory()) {
-//////                    bmp = BitmapFactory.decodeFile("/storage/sdcard0/WeKast/cash/slides/" + curSlide + ".jpg");
-//////                }
-////
-////                slideImgView.setImageBitmap(bmp);
-//            }
-//        });
-//    }
-
-//    private void showAnimation(final String curSlide, final String curAnimation) {
-//        mainActivity.runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                videoView.setVideoPath(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".mp4");
-//                slideImgView.setVisibility(View.INVISIBLE);
-//                videoView.setVisibility(View.VISIBLE);
-//                videoView.start();
-//
-//                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                    @Override
-//                    public void onCompletion(MediaPlayer mp) {
-//                        bmp = BitmapFactory.decodeFile(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".jpg");
-//                        slideImgView.setImageBitmap(bmp);
-//                        slideImgView.setVisibility(View.VISIBLE);
-//                    }
-//                });
-//            }
-//        });
-//    }
 
 }

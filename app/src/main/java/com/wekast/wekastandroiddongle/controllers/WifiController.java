@@ -264,14 +264,11 @@ public class WifiController {
         wifiManager.setWifiEnabled(false);
     }
 
+    // TODO: think how to move it to FullscreenActivity - already has this method
     public void restoreDesktop() {
-
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
-
-
                 TextView loggerView = (TextView) mainActivity.findViewById(R.id.logger);
                 FrameLayout logoFrame = (FrameLayout) mainActivity.findViewById(R.id.logoFrame);
                 ImageView slideImgView = (ImageView) mainActivity.findViewById(R.id.slideIMG);
@@ -281,20 +278,6 @@ public class WifiController {
                 videoView.setVisibility(View.INVISIBLE);
                 logoFrame.setBackgroundColor(Color.rgb(255, 255, 255));
                 loggerView.setVisibility(View.VISIBLE);
-
-//                videoView.setVideoPath(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".mp4");
-//                slideImgView.setVisibility(View.INVISIBLE);
-//                videoView.setVisibility(View.VISIBLE);
-//                videoView.start();
-//
-//                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                    @Override
-//                    public void onCompletion(MediaPlayer mp) {
-//                        bmp = BitmapFactory.decodeFile(APP_PATH + "cash/animations/slide" + curSlide + "_animation" + curAnimation + ".jpg");
-//                        slideImgView.setImageBitmap(bmp);
-//                        slideImgView.setVisibility(View.VISIBLE);
-//                    }
-//                });
             }
         });
     }

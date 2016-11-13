@@ -15,18 +15,13 @@ import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.wekast.wekastandroiddongle.R;
-import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.services.DongleService;
 import com.wekast.wekastandroiddongle.services.IsWiFiConnectedService;
 
@@ -78,12 +73,12 @@ public class FullscreenActivity extends AppCompatActivity {
         textView = (TextView) findViewById(R.id.logger);
         textView.setMovementMethod(new ScrollingMovementMethod());
 
-        final Button button = (Button) findViewById(R.id.testButton);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                workWithVideo();
-            }
-        });
+//        final Button button = (Button) findViewById(R.id.testButton);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                // TODO: add button on/off AP, and on/off WiFi for testing application
+//            }
+//        });
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
 
@@ -91,46 +86,6 @@ public class FullscreenActivity extends AppCompatActivity {
         slideImgView = (ImageView) findViewById(R.id.slideIMG);
         videoView = (VideoView) findViewById(R.id.videoView);
         loggerView = (TextView) findViewById(R.id.logger);
-    }
-
-    private void workWithVideo() {
-        // set background color to black
-        FrameLayout logoFrame = (FrameLayout) findViewById(R.id.logoFrame);
-        logoFrame.setBackgroundColor(Color.rgb(0, 0, 0));
-
-        // show video
-        String curSlide = "12";
-        final VideoView animation = (VideoView) findViewById(R.id.videoView);
-//        String path = "android.resource://" + getPackageName() + "/" + R.raw.video_file;
-//        String uriPath = "android.resource://com.android.AndroidVideoPlayer/"+R.raw.k;
-//        "android.resource//" + getActivity().getPackageName() + "/" + R.raw.videofile)
-//        Log.i("video", "android.resource//" + this.getPackageName() + "/" + R.raw.videofile);
-//        animation.setVideoPath("/sdcard/wekastdongle/cash/animations/slide14_animation1.mp4");
-        animation.setVideoPath("/sdcard/wekastdongle/cash/video/v5.mp4");
-//        animation.setVideoPath("/sdcard/wekastdongle/cash/animations/slide" + curSlide + "animation" + curSlide + ".mp4");
-        animation.setMediaController(new MediaController(this));
-        animation.setVisibility(View.VISIBLE);
-//        animation.setEnabled(true);
-//        animation.requestFocus(0);
-        animation.start();
-
-//                VideoView simpleVideoView = (VideoView) findViewById(R.id.simpleVideoView); // initiate a video view
-// perform set on completion listener event on video view
-        animation.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                Utils.toastShowBottom(FullscreenActivity.context, "Hello");
-                animation.setVisibility(View.INVISIBLE);
-                FrameLayout logoFrame = (FrameLayout) findViewById(R.id.logoFrame);
-                logoFrame.setBackgroundColor(Color.rgb(255, 255, 255));
-//                animation.setEnabled(false);
-// do something when the end of the video is reached
-            }
-        });
-
-
-
-//        logoFrame.setBackgroundColor(Color.rgb(255, 255, 255));
     }
 
     @Override
@@ -182,9 +137,6 @@ public class FullscreenActivity extends AppCompatActivity {
             }
 
             if (curCommand.equals("stop")) {
-//                logoFrame.setBackgroundColor(Color.rgb(0, 0, 0));
-//                loggerView.setVisibility(View.INVISIBLE);
-
                 videoView.setVisibility(View.INVISIBLE);
                 slideImgView.setVisibility(View.INVISIBLE);
                 FrameLayout logoFrame = (FrameLayout) findViewById(R.id.logoFrame);
