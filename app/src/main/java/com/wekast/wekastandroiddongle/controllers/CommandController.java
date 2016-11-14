@@ -7,6 +7,7 @@ import com.wekast.wekastandroiddongle.commands.ConfigCommand;
 import com.wekast.wekastandroiddongle.commands.ErrorAnswer;
 import com.wekast.wekastandroiddongle.commands.FileCommand;
 import com.wekast.wekastandroiddongle.commands.ICommand;
+import com.wekast.wekastandroiddongle.commands.PingCommand;
 import com.wekast.wekastandroiddongle.commands.SlideCommand;
 import com.wekast.wekastandroiddongle.commands.StopCommand;
 import com.wekast.wekastandroiddongle.services.DongleService;
@@ -28,6 +29,10 @@ import org.json.JSONObject;
  * {"message":"ok","type":"slide","device":"dongle"}
  * Request from client to dongle to stop showing presentation
  * {"command":"stop"}
+ * Request from client to dongle check connection
+ * {"command":"ping"}
+ * Response from dongle on command "ping"
+ * {"message":"ok","type":"ping","device":"dongle"}
  *
  * Created by ELAD on 10/15/2016.
  */
@@ -64,6 +69,9 @@ public class CommandController {
                     break;
                 case "stop":
                     command = new StopCommand(this);
+                    break;
+                case "ping":
+                    command = new PingCommand(this);
                     break;
                 default:
                     // TODO: make self class exception

@@ -1,25 +1,17 @@
 package com.wekast.wekastandroiddongle.controllers;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.media.MediaPlayer;
 import android.util.Log;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.activity.FullscreenActivity;
 import com.wekast.wekastandroiddongle.commands.Answer;
 import com.wekast.wekastandroiddongle.commands.ConfigCommand;
+import com.wekast.wekastandroiddongle.commands.FileAnswer;
 import com.wekast.wekastandroiddongle.commands.FileCommand;
 import com.wekast.wekastandroiddongle.commands.ICommand;
-import com.wekast.wekastandroiddongle.commands.SlideCommand;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -160,7 +152,8 @@ public class SocketController {
 
             PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
             // TODO: think what to send in response
-            out.println("response");
+//            out.println("response");
+            out.println(new FileAnswer());
         } catch (Exception e) {
             e.printStackTrace();
         }
