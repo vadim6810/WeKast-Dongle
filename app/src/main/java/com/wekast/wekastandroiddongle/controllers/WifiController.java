@@ -114,11 +114,13 @@ public class WifiController {
     private final WifiManager wifiManager;
     private Context context;
     private WifiConfiguration oldConfig;
-    Activity mainActivity = FullscreenActivity.getMainActivity();
-    TextView textView = (TextView) mainActivity.findViewById(R.id.logger);
+    private Activity mainActivity;
+    private TextView textView;
 
     public WifiController(Context context) {
         this.context = context;
+        mainActivity = FullscreenActivity.getMainActivity();
+        textView = (TextView) mainActivity.findViewById(R.id.logger);
         wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         // Сохраняем старые настройки точки доступа
         oldConfig = getWifiApConfiguration(wifiManager);
@@ -269,7 +271,7 @@ public class WifiController {
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                TextView loggerView = (TextView) mainActivity.findViewById(R.id.logger);
+//                TextView loggerView = (TextView) mainActivity.findViewById(R.id.logger);
                 FrameLayout logoFrame = (FrameLayout) mainActivity.findViewById(R.id.logoFrame);
                 ImageView slideImgView = (ImageView) mainActivity.findViewById(R.id.slideIMG);
                 VideoView videoView = (VideoView) mainActivity.findViewById(R.id.videoView);
@@ -277,7 +279,7 @@ public class WifiController {
                 slideImgView.setVisibility(View.INVISIBLE);
                 videoView.setVisibility(View.INVISIBLE);
                 logoFrame.setBackgroundColor(Color.rgb(255, 255, 255));
-                loggerView.setVisibility(View.VISIBLE);
+//                loggerView.setVisibility(View.VISIBLE);
             }
         });
     }

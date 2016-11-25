@@ -17,43 +17,23 @@ public class SlideCommand implements ICommand {
     }
 
     private String slide;
-    private String animation;
-    private String video;
-    private String audio;
+    private String media;
 
     @Override
     public Answer execute() {
-        controller.getService().showSlide(slide, animation);
+        controller.getService().showSlide(slide, media);
         return new SlideAnswer();
     }
 
     @Override
     public void parseArgs(JSONObject jsonObject) throws JSONException {
         slide = jsonObject.getString("slide");
-        animation = jsonObject.getString("animation");
-        video = jsonObject.getString("video");
-        audio = jsonObject.getString("audio");
+        media = jsonObject.getString("media");
     }
 
     @Override
     public String getCommand() {
         return "slide";
-    }
-
-    public String getSlide() {
-        return slide;
-    }
-
-    public String getAnimation() {
-        return animation;
-    }
-
-    public String getVideo() {
-        return video;
-    }
-
-    public String getAudio() {
-        return audio;
     }
 
 }

@@ -33,7 +33,7 @@ public class DongleService extends Service {
     }
 
     public void showSlide(String slide, String animation) {
-        Intent intent = new Intent("INTENT_FILTER_NAME");
+        Intent intent = new Intent("MAIN_WINDOW");
         intent.putExtra("command", "slide");
         intent.putExtra("slide", slide);
         intent.putExtra("animation", animation);
@@ -41,9 +41,36 @@ public class DongleService extends Service {
     }
 
     public void stopPresentation() {
-        Intent intent = new Intent("INTENT_FILTER_NAME");
+        Intent intent = new Intent("MAIN_WINDOW");
         intent.putExtra("command", "stop");
         intent.putExtra("stop", "1");
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+    }
+
+    public void showProgressDialogReceiving() {
+        Intent intent = new Intent("MAIN_WINDOW");
+        intent.putExtra("command", "show_progress_bar");
+        intent.putExtra("message", "Receiving presentation...");
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+    }
+
+    public void showProgressDialogUnzip() {
+        Intent intent = new Intent("MAIN_WINDOW");
+        intent.putExtra("command", "show_progress_bar");
+        intent.putExtra("message", "Unzipping presentation...");
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+    }
+
+    public void showProgressDialogParsing() {
+        Intent intent = new Intent("MAIN_WINDOW");
+        intent.putExtra("command", "show_progress_bar");
+        intent.putExtra("message", "Parsing presentation...");
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+    }
+
+    public void hideProgressDialog() {
+        Intent intent = new Intent("MAIN_WINDOW");
+        intent.putExtra("command", "hide_progress_bar");
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
 
@@ -109,7 +136,5 @@ public class DongleService extends Service {
             super.onDestroy();
         }
     }
-
-
 
 }

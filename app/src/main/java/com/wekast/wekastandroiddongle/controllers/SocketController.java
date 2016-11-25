@@ -25,9 +25,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-//import static com.wekast.wekastandroiddongle.Utils.Utils.DONGLE_SOCKET_PORT_FILE_TRANSFER;
-//import static com.wekast.wekastandroiddongle.Utils.Utils.unZipPresentation;
-import static com.wekast.wekastandroiddongle.Utils.Utils.APP_PATH;
+import static com.wekast.wekastandroiddongle.Utils.Utils.PRESENTATION_FILE_PATH;
 
 public class SocketController {
 
@@ -122,37 +120,32 @@ public class SocketController {
     }
 
     public void waitForFile(String fileSize) {
-        int bytesRead;
-        int current = 0;
         FileOutputStream fos = null;
         BufferedOutputStream bos = null;
         Socket sock = null;
         try {
             sock = serverSocketFile.accept();
 
-            // receive file
-            byte [] mybytearray  = new byte [Integer.valueOf(fileSize)];
+            commandController.getService().showProgressDialogReceiving();
+            logToTextView("Receiving presentation", PRESENTATION_FILE_PATH);
+
+            fos = new FileOutputStream(PRESENTATION_FILE_PATH);
             InputStream is = sock.getInputStream();
-            fos = new FileOutputStream(APP_PATH + "presentation.ezs");
-            bos = new BufferedOutputStream(fos);
-            bytesRead = is.read(mybytearray,0,mybytearray.length);
-            current = bytesRead;
-
-            do {
-                bytesRead =
-                        is.read(mybytearray, current, (mybytearray.length-current));
-                if(bytesRead > 0)
-                    current += bytesRead;
-            } while(bytesRead > 0);
-
-            bos.write(mybytearray, 0 , current);
-            bos.flush();
-            System.out.println("File " + APP_PATH + "presentation.ezs"
-                    + " downloaded (" + current + " bytes read)");
+            int bytesToRead = Integer.valueOf(fileSize);
+            int bufferLength;
+            byte[] buffer = new byte[1024 * 10];
+            while (true) {
+                bufferLength = is.read(buffer);
+                bytesToRead -= bufferLength;
+                fos.write(buffer, 0, bufferLength);
+                if (bytesToRead == 0)
+                    break;
+            }
+            commandController.getService().hideProgressDialog();
+            logToTextView("Success: ", "File " + PRESENTATION_FILE_PATH
+                    + " downloaded (" + fileSize + " bytes readed)");
 
             PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
-            // TODO: think what to send in response
-//            out.println("response");
             out.println(new FileAnswer());
         } catch (Exception e) {
             e.printStackTrace();
@@ -170,10 +163,16 @@ public class SocketController {
             }
         }
 
-        // TODO: move path to constants
-        Utils.initWorkFolder();
-        Utils.clearWorkDirectory();
-        Utils.unZipPresentation(APP_PATH + "presentation.ezs");
+
+        commandController.getService().showProgressDialogUnzip();
+        logToTextView("Unzip started", PRESENTATION_FILE_PATH);
+        Utils.unZipPresentation(PRESENTATION_FILE_PATH);
+        logToTextView("Unzip finished", PRESENTATION_FILE_PATH);
+        commandController.getService().hideProgressDialog();
+
+        commandController.getService().showProgressDialogParsing();
+        Utils.createWorkArray();
+        commandController.getService().hideProgressDialog();
     }
 
     private void logToTextView(final String message, final String variable) {
