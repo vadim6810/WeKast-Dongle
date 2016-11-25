@@ -1,13 +1,7 @@
 package com.wekast.wekastandroiddongle.Utils;
 
-
-
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.ContextWrapper;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,7 +11,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
 
 @SuppressLint("SimpleDateFormat")
 //	public class Loger implements Constants {

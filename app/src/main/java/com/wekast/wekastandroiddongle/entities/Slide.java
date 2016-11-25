@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by ELAD on 11/20/2016.
- */
-
 public class Slide {
     private String title;
     private int slideNumber;
@@ -58,4 +54,5 @@ public class Slide {
                 ", mediaType=" + mediaType +
                 '}';
     }
+
 }

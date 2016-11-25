@@ -7,10 +7,6 @@ import android.util.Log;
 
 import com.wekast.wekastandroiddongle.controllers.WifiController;
 
-/**
- * Created by ELAD on 10/31/2016.
- */
-
 public class IsWiFiConnectedService extends Service {
 
     class IsWiFiConnectedServiceThread extends Thread {

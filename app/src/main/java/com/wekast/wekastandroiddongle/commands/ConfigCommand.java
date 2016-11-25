@@ -5,9 +5,6 @@ import com.wekast.wekastandroiddongle.controllers.CommandController;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by ELAD on 10/15/2016.
- */
 public class ConfigCommand implements ICommand {
 
     private CommandController controller;
@@ -42,4 +39,5 @@ public class ConfigCommand implements ICommand {
     public String getPassword() {
         return password;
     }
+
 }

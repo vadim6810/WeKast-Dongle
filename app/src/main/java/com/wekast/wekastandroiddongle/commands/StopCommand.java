@@ -16,10 +16,6 @@ import java.io.File;
 import static com.wekast.wekastandroiddongle.Utils.Utils.APP_PATH;
 import static com.wekast.wekastandroiddongle.Utils.Utils.CASH_DIRECTORY;
 
-/**
- * Created by ELAD on 11/12/2016.
- */
-
 public class StopCommand implements ICommand {
 
     private CommandController controller;
@@ -58,4 +54,5 @@ public class StopCommand implements ICommand {
             }
         });
     }
+
 }

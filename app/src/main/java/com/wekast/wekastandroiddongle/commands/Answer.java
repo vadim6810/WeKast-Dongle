@@ -3,8 +3,8 @@ package com.wekast.wekastandroiddongle.commands;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 public abstract class Answer extends JSONObject {
+
     Answer() {
         add("device", "dongle");
     }
@@ -18,4 +18,5 @@ public abstract class Answer extends JSONObject {
     void setType(String type) {
         add("type", type);
     }
+
 }

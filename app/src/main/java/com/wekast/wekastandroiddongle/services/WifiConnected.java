@@ -4,12 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
-import android.net.wifi.p2p.WifiP2pManager;
-import android.util.Log;
-
-import java.util.ArrayList;
 
 public class WifiConnected extends BroadcastReceiver {
+
     public WifiConnected() {
     }
 
@@ -32,19 +29,13 @@ public class WifiConnected extends BroadcastReceiver {
 
 //        int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1);
 
-
         if (wifiState == 3) {
 
-
         }
-
-
-
-
-        int i = 0;
 
         // TODO: check wifi connected and ssid
 //        context.startService(new Intent(context, IsWiFiConnectedService.class));
 //        throw new UnsupportedOperationException("Not yet implemented");
     }
+
 }

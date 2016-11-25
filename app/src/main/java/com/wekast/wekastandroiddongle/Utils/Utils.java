@@ -28,9 +28,6 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-/**
- * Created by Meztiros on 01.08.2016.
- */
 public class Utils {
 
     public static final String SERVICE_API_URL = "http://78.153.150.254";

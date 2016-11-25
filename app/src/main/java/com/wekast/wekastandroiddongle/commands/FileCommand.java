@@ -5,10 +5,6 @@ import com.wekast.wekastandroiddongle.controllers.CommandController;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by ELAD on 10/23/2016.
- */
-
 public class FileCommand implements ICommand {
 
     private CommandController controller;

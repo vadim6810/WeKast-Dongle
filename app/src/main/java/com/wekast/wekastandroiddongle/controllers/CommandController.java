@@ -33,8 +33,6 @@ import org.json.JSONObject;
  * {"command":"ping"}
  * Response from dongle on command "ping"
  * {"message":"ok","type":"ping","device":"dongle"}
- *
- * Created by ELAD on 10/15/2016.
  */
 public class CommandController {
 

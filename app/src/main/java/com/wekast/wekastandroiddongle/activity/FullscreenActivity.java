@@ -34,9 +34,6 @@ import java.util.Map;
 
 import static com.wekast.wekastandroiddongle.Utils.Utils.APP_PATH;
 
-/**
- * Created by ELAD on 10/23/2016.
- */
 public class FullscreenActivity extends AppCompatActivity {
 
     private static Context context;

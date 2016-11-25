@@ -25,10 +25,6 @@ import com.wekast.wekastandroiddongle.services.WifiConnected;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-/**
- * Created by ELAD on 10/14/2016.
- */
-
 public class WifiController {
 
     private static final String AP_SSID_KEY = "ACCESS_POINT_SSID_ON_APP";
@@ -283,4 +279,5 @@ public class WifiController {
             }
         });
     }
+
 }

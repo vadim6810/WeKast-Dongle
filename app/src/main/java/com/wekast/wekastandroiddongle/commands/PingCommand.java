@@ -5,10 +5,6 @@ import com.wekast.wekastandroiddongle.controllers.CommandController;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by ELAD on 11/14/2016.
- */
-
 public class PingCommand implements ICommand {
 
     private CommandController controller;
@@ -31,4 +27,5 @@ public class PingCommand implements ICommand {
     public String getCommand() {
         return "ping";
     }
+
 }
