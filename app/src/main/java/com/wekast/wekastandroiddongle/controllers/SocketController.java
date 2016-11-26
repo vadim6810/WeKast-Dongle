@@ -63,6 +63,7 @@ public class SocketController {
                         break;
                     }
                     logToTextView("Received task", task);
+                    Log.i("SocketController", "waitForTask receivedTask=" + task);
 
                     // TODO: move answer after commands
                     Answer answer = commandController.processTask(task);
