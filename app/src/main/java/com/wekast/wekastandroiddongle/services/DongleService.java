@@ -6,6 +6,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.controllers.CommandController;
 import com.wekast.wekastandroiddongle.controllers.SocketController;
 import com.wekast.wekastandroiddongle.controllers.WifiController;
@@ -89,7 +90,12 @@ public class DongleService extends Service {
 
     private void init() {
         if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_OFF) {
-            wifiController.changeState(WifiController.WifiState.WIFI_STATE_AP);
+            Boolean ClientSsidExist = Utils.getContainsSP(wifiController.getContext(), "ACCESS_POINT_SSID_ON_APP");
+            if (!ClientSsidExist)
+                wifiController.changeState(WifiController.WifiState.WIFI_STATE_AP);
+            else
+                wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
+
             socketController.waitForTask();
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_CONNECT) {
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_AP) {

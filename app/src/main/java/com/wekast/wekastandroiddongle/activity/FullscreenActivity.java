@@ -27,7 +27,6 @@ import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.entities.Slide;
 import com.wekast.wekastandroiddongle.services.DongleService;
-import com.wekast.wekastandroiddongle.services.IsWiFiConnectedService;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -38,7 +37,6 @@ public class FullscreenActivity extends AppCompatActivity {
 
     private static Context context;
     private static Activity activity;
-//    private TextView textView;
     private LocalBroadcastManager mLocalBroadcastManager;
 
     private FrameLayout logoFrame;
@@ -71,6 +69,8 @@ public class FullscreenActivity extends AppCompatActivity {
         FullscreenActivity.context = getApplicationContext();
         FullscreenActivity.activity = this;
         setContentView(R.layout.activity_fullscreen);
+
+//        showSharedPreferencesVariables();
 
         if (requestSettingsPermissions()) {
             startService(new Intent(this, DongleService.class));
@@ -208,9 +208,10 @@ public class FullscreenActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(this, DongleService.class));
-        stopService(new Intent(this, IsWiFiConnectedService.class));
+//        stopService(new Intent(this, IsWiFiConnectedService.class));
     }
 
+    // TODO: think maybe not needed on dongle
     private boolean requestSettingsPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.System.canWrite(this)) {
@@ -221,5 +222,13 @@ public class FullscreenActivity extends AppCompatActivity {
         }
         return true;
     }
+
+//    private void showSharedPreferencesVariables() {
+//        SharedPreferences sp = Utils.getSharedPreferences(getAppContext());
+//        Map<String, ?> mapSP = sp.getAll();
+//        for (Map.Entry<String, ?> entry : mapSP.entrySet()) {
+//            System.out.println(entry.getKey() + "/" + entry.getValue());
+//        }
+//    }
 
 }

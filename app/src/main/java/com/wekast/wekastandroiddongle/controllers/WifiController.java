@@ -2,7 +2,6 @@ package com.wekast.wekastandroiddongle.controllers;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -19,7 +18,6 @@ import android.widget.VideoView;
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.activity.FullscreenActivity;
-import com.wekast.wekastandroiddongle.services.IsWiFiConnectedService;
 import com.wekast.wekastandroiddongle.services.WifiConnected;
 
 import java.lang.reflect.InvocationTargetException;
@@ -29,7 +27,6 @@ public class WifiController {
 
     private static final String AP_SSID_KEY = "ACCESS_POINT_SSID_ON_APP";
     private static final String AP_PASS_KEY = "ACCESS_POINT_PASS_ON_APP";
-    private static final String TAG = "dongle.wekast";
 
     private static Method setWifiApEnabled;
     private static Method isWifiApEnabled;
@@ -113,6 +110,10 @@ public class WifiController {
     private Activity mainActivity;
     private TextView textView;
 
+    public Context getContext() {
+        return context;
+    }
+
     public WifiController(Context context) {
         this.context = context;
         mainActivity = FullscreenActivity.getMainActivity();
@@ -189,7 +190,7 @@ public class WifiController {
         logToTextView("try to connect to ", curSsid);
         WifiConnected receiver = new WifiConnected();
         context.registerReceiver(receiver, new IntentFilter());
-        mainActivity.startService(new Intent(mainActivity, IsWiFiConnectedService.class));
+//        mainActivity.startService(new Intent(mainActivity, IsWiFiConnectedService.class));
 
         // TODO: check if connection established
         return true;
@@ -218,6 +219,7 @@ public class WifiController {
         //TODO: in progress
         if (wifiState == WifiState.WIFI_STATE_CONNECT) {
             // TODO: set curState WIFI_STARE_CONNECTING. check if connection is established set WIFI_STATE_CONNECTED
+            startConnection();
             curWifiState = WifiState.WIFI_STATE_CONNECT;
         } else if (wifiState == WifiState.WIFI_STATE_AP) {
             wifiManager.setWifiEnabled(false);

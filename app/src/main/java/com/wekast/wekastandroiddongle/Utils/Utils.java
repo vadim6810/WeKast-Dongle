@@ -122,6 +122,10 @@ public class Utils {
         return  login;
     }
 
+    public static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences(SHAREDPREFERNCE, context.MODE_PRIVATE);
+    }
+
     public static void setFieldSP(Context context, String field1, String field2) {
         SharedPreferences settingsActivity = context.getSharedPreferences(Utils.SHAREDPREFERNCE, context.MODE_PRIVATE);
         SharedPreferences.Editor prefEditor = settingsActivity.edit();
@@ -250,14 +254,6 @@ public class Utils {
                             if (parser.getAttributeCount() > 2)
                                 comments = parser.getAttributeValue(2);
                         }
-//                        if (parser.getName().equals("audio")) {
-//                            chID.add(Integer.parseInt(parser.getAttributeValue(0)));
-//                            mediaType.put(Integer.parseInt(parser.getAttributeValue(0)), "audio");
-//                        }
-//                        if (parser.getName().equals("video")) {
-//                            chID.add(Integer.parseInt(parser.getAttributeValue(0)));
-//                            mediaType.put(Integer.parseInt(parser.getAttributeValue(0)), "video");
-//                        }
                         if (parser.getName().equals("animation")) {
                             chID.add(Integer.parseInt(parser.getAttributeValue(0)));
                             mediaType.put(Integer.parseInt(parser.getAttributeValue(0)), "animation");
