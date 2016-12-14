@@ -36,7 +36,7 @@ import org.json.JSONObject;
  */
 public class CommandController {
 
-    public static final String TAG = "Dongle";
+    private static final String TAG = "CommandController";
     private DongleService service;
 
     public DongleService getService() {
@@ -75,10 +75,10 @@ public class CommandController {
                     // TODO: make self class exception
                     throw new Exception("Unknown command");
             }
-//            command.parseArgs(jsonRootObject.getJSONObject("args"));
             return command;
         } catch (JSONException e) {
             // TODO throw exception
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
             throw e;
         }

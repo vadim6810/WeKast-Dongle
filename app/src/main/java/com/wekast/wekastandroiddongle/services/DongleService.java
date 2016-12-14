@@ -15,11 +15,11 @@ import java.io.IOException;
 
 public class DongleService extends Service {
 
-    private ServiceThread thread;
-
+    private static final String TAG = "DongleService";
     private WifiController wifiController;
     private SocketController socketController;
     private CommandController commandController;
+    private ServiceThread thread;
 
     public WifiController getWifiController() {
         return wifiController;
@@ -91,18 +91,18 @@ public class DongleService extends Service {
     private void init() {
         if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_OFF) {
             Boolean ClientSsidExist = Utils.getContainsSP(wifiController.getContext(), "ACCESS_POINT_SSID_ON_APP");
-            if (!ClientSsidExist)
+            if (!ClientSsidExist) {
                 wifiController.changeState(WifiController.WifiState.WIFI_STATE_AP);
-            else
+//                wifiController.logToTextView("DONGLE WAITING...", "");
+            } else {
                 wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
-
+                wifiController.printInfoMessage("DONGLE WAITING...\n\n");
+            }
             socketController.waitForTask();
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_CONNECT) {
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_AP) {
         }
     }
-
-    public static final String TAG = "Dongle";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -112,7 +112,7 @@ public class DongleService extends Service {
 
     @Override
     public void onCreate() {
-        Log.i(TAG, "Service started");
+        Log.e(TAG, "Service started");
         super.onCreate();
 
         try {
@@ -123,6 +123,7 @@ public class DongleService extends Service {
             thread.start();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
+            e.printStackTrace();
             stopSelf();
         }
     }
@@ -130,13 +131,14 @@ public class DongleService extends Service {
     @Override
     public void onDestroy() {
         try {
-            Log.i(TAG, "Service stopped");
+            Log.e(TAG, "Service stopped");
             socketController.close();
             wifiController.restore();
             if (thread != null) {
                 thread.interrupt();
             }
         } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         } finally {
             super.onDestroy();

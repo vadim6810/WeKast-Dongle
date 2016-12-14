@@ -16,6 +16,7 @@ import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -35,6 +36,7 @@ import static com.wekast.wekastandroiddongle.Utils.Utils.APP_PATH;
 
 public class FullscreenActivity extends AppCompatActivity {
 
+    private static final String TAG = "FullscreenActivity";
     private static Context context;
     private static Activity activity;
     private LocalBroadcastManager mLocalBroadcastManager;
@@ -46,7 +48,6 @@ public class FullscreenActivity extends AppCompatActivity {
     private TextView loggerView;
     private ProgressDialog progressDialog;
     private Bitmap bmp;
-
 
     public static Context getAppContext() {
         return FullscreenActivity.context;
@@ -92,7 +93,7 @@ public class FullscreenActivity extends AppCompatActivity {
         icLogo = (ImageView) findViewById(R.id.ic_logo);
         slideImgView = (ImageView) findViewById(R.id.slideIMG);
         videoView = (VideoView) findViewById(R.id.videoView);
-//        loggerView = (TextView) findViewById(R.id.logger);
+        loggerView = (TextView) findViewById(R.id.logger);
 //        progressBar = (ProgressBar) findViewById(R.id.progressBar);
     }
 
@@ -132,12 +133,17 @@ public class FullscreenActivity extends AppCompatActivity {
                 showProgressDialog(intent.getStringExtra("message"));
             if (curCommand.equals("hide_progress_bar"))
                 hideProgressDialog();
+            if (curCommand.equals("info")) {
+                loggerView.setText(intent.getStringExtra("message"));
+            }
+
         }
     };
 
     private void showSlide(final String curSlide) {
+        Log.e(TAG, "show slide " + curSlide);
         logoFrame.setBackgroundColor(Color.rgb(0, 0, 0));
-//        loggerView.setVisibility(View.INVISIBLE);
+        loggerView.setVisibility(View.INVISIBLE);
         icLogo.setVisibility(View.INVISIBLE);
 
         bmp = BitmapFactory.decodeFile(APP_PATH + "cash/slides/" + curSlide + ".jpg");
@@ -146,8 +152,9 @@ public class FullscreenActivity extends AppCompatActivity {
     }
 
     private void showSlide(final String curSlide, final String curMedia) {
+        Log.e(TAG, "show slide " + curSlide + " media " + curMedia);
         logoFrame.setBackgroundColor(Color.rgb(0, 0, 0));
-//        loggerView.setVisibility(View.INVISIBLE);
+        loggerView.setVisibility(View.INVISIBLE);
         icLogo.setVisibility(View.INVISIBLE);
 
         ArrayList<Slide> slidesList = Utils.slidesList;
@@ -194,7 +201,7 @@ public class FullscreenActivity extends AppCompatActivity {
         FrameLayout logoFrame = (FrameLayout) findViewById(R.id.logoFrame);
         logoFrame.setBackgroundColor(Color.rgb(255, 255, 255));
         icLogo.setVisibility(View.VISIBLE);
-//        loggerView.setVisibility(View.VISIBLE);
+        loggerView.setVisibility(View.VISIBLE);
     }
 
     private void showProgressDialog(String message) {
@@ -221,6 +228,19 @@ public class FullscreenActivity extends AppCompatActivity {
             }
         }
         return true;
+    }
+
+    public void setInfoMessage(String message) {
+        loggerView.setText(message);
+    }
+
+    public void updateTheTextView(final String t) {
+        FullscreenActivity.this.runOnUiThread(new Runnable() {
+            public void run() {
+                TextView textV1 = (TextView) findViewById(R.id.logger);
+                textV1.setText(t);
+            }
+        });
     }
 
 //    private void showSharedPreferencesVariables() {

@@ -31,7 +31,8 @@ public class StopCommand implements ICommand {
         controller.getService().stopPresentation();
         File file = new File(APP_PATH + "presentation.ezs");
         if(file.delete())
-            logToTextView("Presentation", "removed");
+            printInfoMessage("DONGLE CONNECTED\n\nWAITING PRESENTATION\n\n");
+//            logToTextView("Presentation", "removed");
         // TODO: clear cash directory
         Utils.clearWorkDirectory(APP_PATH + CASH_DIRECTORY);
         return new StopAnswer();
@@ -46,11 +47,20 @@ public class StopCommand implements ICommand {
         return "stop";
     }
 
-    private void logToTextView(final String message, final String variable) {
+//    private void logToTextView(final String message, final String variable) {
+//        mainActivity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                loggerView.append(message + ": " + variable + "\n");
+//            }
+//        });
+//    }
+
+    private void printInfoMessage(final String message) {
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                loggerView.append(message + ": " + variable + "\n");
+                loggerView.setText(message);
             }
         });
     }

@@ -9,6 +9,8 @@ import com.wekast.wekastandroiddongle.controllers.WifiController;
 
 public class IsWiFiConnectedService extends Service {
 
+    private static final String TAG = "IsWiFiConnectedService";
+
     class IsWiFiConnectedServiceThread extends Thread {
 
         IsWiFiConnectedServiceThread() {
@@ -28,7 +30,8 @@ public class IsWiFiConnectedService extends Service {
                     if(isPeriodEnded()) {
                         lostWifi = true;
                         disableWifi();
-                        wifiController.logToTextView("Wifi module disabled", "true");
+//                        wifiController.logToTextView("Wifi module disabled", "true");
+                        Log.e(TAG, "Wifi module disabled: true");
                         enableAp();
                         restoreDesktop();
                         break;
@@ -41,10 +44,8 @@ public class IsWiFiConnectedService extends Service {
         }
     }
 
-    public static final String TAG = "Dongle";
     private WifiController wifiController;
     private long timeStart = 0;
-
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -54,7 +55,7 @@ public class IsWiFiConnectedService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "Service isWifiConnnected started");
+        Log.e(TAG, "Service isWifiConnnected started");
         Thread.currentThread().setName("IsWifiConnectedService");
 
         IsWiFiConnectedServiceThread isWiFiConnectedServiceThread = new IsWiFiConnectedServiceThread();
@@ -64,7 +65,7 @@ public class IsWiFiConnectedService extends Service {
     @Override
     public void onDestroy() {
         this.stopSelf();
-        Log.i(TAG, "Service isWifiConnnected stopped");
+        Log.e(TAG, "Service isWifiConnnected stopped");
         super.onDestroy();
     }
 
@@ -105,6 +106,7 @@ public class IsWiFiConnectedService extends Service {
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
     }

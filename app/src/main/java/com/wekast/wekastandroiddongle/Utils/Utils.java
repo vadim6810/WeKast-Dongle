@@ -9,9 +9,6 @@ import android.widget.Toast;
 import com.wekast.wekastandroiddongle.activity.FullscreenActivity;
 import com.wekast.wekastandroiddongle.entities.Slide;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -91,16 +88,16 @@ public class Utils {
         }
     }
 
-    public static void clearWorkDirectory(String absolutePath, String file){
-        File[] clearWorkDirectory = (new File(absolutePath)).listFiles();
-        if(clearWorkDirectory != null){
-            for (File tmp : clearWorkDirectory) {
-                String res = tmp.getName().toString();
-                if(tmp.getName().toString() == file)
-                    clearDirectory(tmp);
-            }
-        }
-    }
+//    public static void clearWorkDirectory(String absolutePath, String file){
+//        File[] clearWorkDirectory = (new File(absolutePath)).listFiles();
+//        if(clearWorkDirectory != null){
+//            for (File tmp : clearWorkDirectory) {
+//                String res = tmp.getName().toString();
+//                if(tmp.getName().toString() == file)
+//                    clearDirectory(tmp);
+//            }
+//        }
+//    }
 
     public static void clearDirectory(File file) {
         if (!file.exists())
@@ -122,9 +119,9 @@ public class Utils {
         return  login;
     }
 
-    public static SharedPreferences getSharedPreferences(Context context) {
-        return context.getSharedPreferences(SHAREDPREFERNCE, context.MODE_PRIVATE);
-    }
+//    public static SharedPreferences getSharedPreferences(Context context) {
+//        return context.getSharedPreferences(SHAREDPREFERNCE, context.MODE_PRIVATE);
+//    }
 
     public static void setFieldSP(Context context, String field1, String field2) {
         SharedPreferences settingsActivity = context.getSharedPreferences(Utils.SHAREDPREFERNCE, context.MODE_PRIVATE);
@@ -137,55 +134,6 @@ public class Utils {
         Toast toast = Toast.makeText(context, s, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
-    }
-
-    public static void toastShowBottom(Context context, String s) {
-//        Toast toast = Toast.makeText(context, s, Toast.LENGTH_LONG);
-        Toast toast = Toast.makeText(context, s, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER|Gravity.BOTTOM, 0, 0);
-        toast.show();
-    }
-
-    public static void writeFile(byte[] content, String FILENAME, String LOG_TAG) {
-        Log.d(LOG_TAG, "writeToFile");
-        FileOutputStream fos;
-        try {
-            fos = new FileOutputStream(new File(Utils.DIRECTORY, FILENAME));
-            fos.write(content);
-            fos.flush();
-            fos.close();
-            Log.d(LOG_TAG, "finish write!!!");
-        } catch (IOException e) {
-            Log.d(LOG_TAG, "error write!!!");
-        }
-    }
-
-    public static HashMap<String, String> parseJSONArrayMap(Context context, String answer) {
-        HashMap<String, String> mapList = new HashMap<>();
-        try {
-            JSONArray jsonArray = new JSONArray(answer);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject index = jsonArray.getJSONObject(i);
-                mapList.put(index.getString("id"), index.getString("name"));
-            }
-        } catch (JSONException e) {
-            toastShow(context, e.toString());
-        }
-        return mapList;
-    }
-
-    public static ArrayList<String> parseJSONArray(Context context, String answer) {
-        ArrayList<String> arrayList = new ArrayList<>();
-        try {
-            JSONArray jsonArray = new JSONArray(answer);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject index = jsonArray.getJSONObject(i);
-                arrayList.add(index.getString("name"));
-            }
-        } catch (JSONException e) {
-            toastShow(context, e.toString());
-        }
-        return arrayList;
     }
 
     public static boolean unZipPresentation(String pathFile) {
@@ -216,23 +164,6 @@ public class Utils {
             bos.write(bytesIn, 0, read);
         }
         bos.close();
-    }
-
-    public static JSONObject createJsonResponse(String task, String status) {
-        // TODO: create rundom ssid and pass
-        JSONObject jsonObject = new JSONObject();
-        JSONArray jsonTask = new JSONArray();
-        JSONObject jsonCommand = new JSONObject();
-        try {
-            jsonCommand.put("command", task);
-            jsonCommand.put("status", status);
-            jsonTask.put(jsonCommand);
-            jsonObject.put("device", "dongle");
-            jsonObject.put("task", jsonTask);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject;
     }
 
     private static int slideNumber;

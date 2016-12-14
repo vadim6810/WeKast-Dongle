@@ -29,7 +29,7 @@ import static com.wekast.wekastandroiddongle.Utils.Utils.PRESENTATION_FILE_PATH;
 
 public class SocketController {
 
-    public static final String TAG = "DongleSocket";
+    private static final String TAG = "SocketController";
     private CommandController commandController;
     private ServerSocket serverSocket;
     private ServerSocket serverSocketFile;
@@ -50,7 +50,8 @@ public class SocketController {
             while (true) {
                 Socket socket = serverSocket.accept();
                 InetAddress clientInetAddress = socket.getInetAddress();
-                logToTextView("Connected client from IP", clientInetAddress.toString());
+//                logToTextView("Connected client from IP", clientInetAddress.toString());
+                Log.e(TAG, "Connected client from IP " + clientInetAddress.toString());
                 InputStream inputStream = socket.getInputStream();
                 OutputStream outputStream = socket.getOutputStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
@@ -62,19 +63,21 @@ public class SocketController {
                         socket.close();
                         break;
                     }
-                    logToTextView("Received task", task);
-                    Log.i("SocketController", "waitForTask receivedTask=" + task);
+//                    logToTextView("Received task", task);
+                    Log.e(TAG, "SocketController waitForTask receivedTask=" + task);
 
                     // TODO: move answer after commands
                     Answer answer = commandController.processTask(task);
                     printWriter.println(answer);
-                    logToTextView("Sended answer", answer.toString());
+//                    logToTextView("Sended answer", answer.toString());
+                    Log.e(TAG, "Sended answer" + answer.toString());
 
                     ICommand icommand = null;
                     try {
                         icommand = commandController.parseCommand(task);
                     } catch (Exception e) {
-                        logToTextView("ERROR", "Unknown TASK");
+//                        logToTextView("ERROR", "Unknown TASK");
+                        Log.e(TAG, "Unknown TASK");
                         break;
                     }
 
@@ -92,7 +95,8 @@ public class SocketController {
                         try {
                             wifiController.startConnection();
                         } catch (Exception e) {
-                            Log.i(TAG, "Socket closed: interrupting");
+                            Log.e(TAG, "Socket closed: interrupting");
+                            e.printStackTrace();
                         }
 //                        wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
                     }
@@ -109,7 +113,8 @@ public class SocketController {
                 }
             }
         } catch (Exception e) {
-            Log.i(TAG, "Socket closed: interrupting");
+            Log.e(TAG, "Socket closed: interrupting");
+            e.printStackTrace();
         }
     }
 
@@ -128,7 +133,8 @@ public class SocketController {
             sock = serverSocketFile.accept();
 
             commandController.getService().showProgressDialogReceiving();
-            logToTextView("Receiving presentation", PRESENTATION_FILE_PATH);
+//            logToTextView("Receiving presentation", PRESENTATION_FILE_PATH);
+            Log.e(TAG, "Receiving presentation" + PRESENTATION_FILE_PATH);
 
             fos = new FileOutputStream(PRESENTATION_FILE_PATH);
             InputStream is = sock.getInputStream();
@@ -143,12 +149,13 @@ public class SocketController {
                     break;
             }
             commandController.getService().hideProgressDialog();
-            logToTextView("Success: ", "File " + PRESENTATION_FILE_PATH
-                    + " downloaded (" + fileSize + " bytes readed)");
+//            logToTextView("Success: ", "File " + PRESENTATION_FILE_PATH + " downloaded (" + fileSize + " bytes readed)");
+            Log.e(TAG, "File " + PRESENTATION_FILE_PATH + " downloaded (" + fileSize + " bytes readed)");
 
             PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
             out.println(new FileAnswer());
         } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
         finally {
@@ -160,15 +167,17 @@ public class SocketController {
                 if (sock != null)
                     sock.close();
             } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
                 e.printStackTrace();
             }
         }
 
-
         commandController.getService().showProgressDialogUnzip();
-        logToTextView("Unzip started", PRESENTATION_FILE_PATH);
+//        logToTextView("Unzip started", PRESENTATION_FILE_PATH);
+        Log.e(TAG, "Unzip started " + PRESENTATION_FILE_PATH);
         Utils.unZipPresentation(PRESENTATION_FILE_PATH);
-        logToTextView("Unzip finished", PRESENTATION_FILE_PATH);
+//        logToTextView("Unzip finished", PRESENTATION_FILE_PATH);
+        Log.e(TAG, "Unzip finished " + PRESENTATION_FILE_PATH);
         commandController.getService().hideProgressDialog();
 
         commandController.getService().showProgressDialogParsing();
@@ -176,13 +185,13 @@ public class SocketController {
         commandController.getService().hideProgressDialog();
     }
 
-    private void logToTextView(final String message, final String variable) {
-        mainActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                loggerView.append(message + ": " + variable + "\n");
-            }
-        });
-    }
+//    private void logToTextView(final String message, final String variable) {
+//        mainActivity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                loggerView.append(message + ": " + variable + "\n");
+//            }
+//        });
+//    }
 
 }

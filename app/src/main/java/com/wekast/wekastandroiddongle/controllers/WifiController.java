@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -23,7 +24,11 @@ import com.wekast.wekastandroiddongle.services.WifiConnected;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static com.wekast.wekastandroiddongle.Utils.Utils.PRESENTATION_FILE_PATH;
+
 public class WifiController {
+
+    private static final String TAG = "WifiController";
 
     private static final String AP_SSID_KEY = "ACCESS_POINT_SSID_ON_APP";
     private static final String AP_PASS_KEY = "ACCESS_POINT_PASS_ON_APP";
@@ -38,9 +43,8 @@ public class WifiController {
     private static boolean setWifiApEnabled(WifiManager wifiManager, WifiConfiguration wifiConfiguration, boolean enabled) {
         try {
             return (boolean) setWifiApEnabled.invoke(wifiManager, wifiConfiguration, enabled);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -49,9 +53,8 @@ public class WifiController {
     private static boolean isWifiApEnabled(WifiManager wifiManager) {
         try {
             return (boolean) isWifiApEnabled.invoke(wifiManager);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -60,9 +63,8 @@ public class WifiController {
     private static WifiConfiguration getWifiApConfiguration(WifiManager wifiManager) {
         try {
             return (WifiConfiguration) getWifiApConfiguration.invoke(wifiManager);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -71,9 +73,8 @@ public class WifiController {
     private static boolean setWifiApConfiguration(WifiManager wifiManager, WifiConfiguration wifiConfiguration) {
         try {
             return (boolean) setWifiApConfiguration.invoke(wifiManager, wifiConfiguration);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -148,13 +149,15 @@ public class WifiController {
      */
     public boolean startAP() {
         boolean result = isWifiApEnabled(wifiManager) || setWifiApEnabled(wifiManager, configureWifi(), true);
-        logToTextView("Accesss Point started", String.valueOf(result));
+//        logToTextView("Accesss Point started", String.valueOf(result));
+        Log.e(TAG, "Accesss Point started"  + String.valueOf(result));
         return result;
     }
 
     public boolean stopAP() {
         boolean result = setWifiApEnabled(wifiManager, oldConfig, false);
-        logToTextView("Accesss Point stopped", String.valueOf(result));
+//        logToTextView("Accesss Point stopped", String.valueOf(result));
+        Log.e(TAG, "Accesss Point stopped "  + String.valueOf(result));
         return result;
     }
 
@@ -173,6 +176,7 @@ public class WifiController {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
+            Log.e(TAG, e.getMessage());
             e.printStackTrace();
         }
         String curSsid = Utils.getFieldSP(context,AP_SSID_KEY);
@@ -187,7 +191,8 @@ public class WifiController {
         wifiManager.enableNetwork(networkId, true);
         wifiManager.reconnect();
 
-        logToTextView("try to connect to ", curSsid);
+//        logToTextView("try to connect to ", curSsid);
+        Log.e(TAG, "try to connect to " + curSsid);
         WifiConnected receiver = new WifiConnected();
         context.registerReceiver(receiver, new IntentFilter());
 //        mainActivity.startService(new Intent(mainActivity, IsWiFiConnectedService.class));
@@ -234,11 +239,20 @@ public class WifiController {
         WIFI_STATE_CONNECT
     }
 
-    public void logToTextView(final String message, final String variable) {
+//    public void logToTextView(final String message, final String variable) {
+//        mainActivity.runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                textView.append(message + ": " + variable + "\n");
+//            }
+//        });
+//    }
+
+    public void printInfoMessage(final String message) {
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                textView.append(message + ": " + variable + "\n");
+                textView.setText(message);
             }
         });
     }
@@ -254,7 +268,7 @@ public class WifiController {
         String curSsid  = info.getSSID();
         boolean isConnected = networkInfo.isConnected();
         String curSsidFromSP = Utils.getFieldSP(context, AP_SSID_KEY);
-        int i = 0;
+//        int i = 0;
         if (curSsid.equals("\"" + curSsidFromSP + "\"") && isConnected)
             return true;
         return false;
@@ -269,7 +283,7 @@ public class WifiController {
         mainActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                TextView loggerView = (TextView) mainActivity.findViewById(R.id.logger);
+                TextView loggerView = (TextView) mainActivity.findViewById(R.id.logger);
                 FrameLayout logoFrame = (FrameLayout) mainActivity.findViewById(R.id.logoFrame);
                 ImageView slideImgView = (ImageView) mainActivity.findViewById(R.id.slideIMG);
                 VideoView videoView = (VideoView) mainActivity.findViewById(R.id.videoView);
@@ -277,7 +291,8 @@ public class WifiController {
                 slideImgView.setVisibility(View.INVISIBLE);
                 videoView.setVisibility(View.INVISIBLE);
                 logoFrame.setBackgroundColor(Color.rgb(255, 255, 255));
-//                loggerView.setVisibility(View.VISIBLE);
+                loggerView.setVisibility(View.VISIBLE);
+                loggerView.setText("DONGLE CONNECTED\nWAITING PRESENTATION\n\n");
             }
         });
     }

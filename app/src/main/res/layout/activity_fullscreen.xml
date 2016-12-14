@@ -45,7 +45,7 @@
         android:gravity="bottom"
         android:scrollbars="vertical"
         android:textColor="@android:color/black"
-        android:visibility="invisible"
+        android:textAlignment="center"
          />
 
     <Button
