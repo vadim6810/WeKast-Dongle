@@ -15,6 +15,7 @@ import com.wekast.wekastandroiddongle.commands.ICommand;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,9 +47,10 @@ public class SocketController {
     }
 
     public void waitForTask() {
+        Socket socket = null;
         try {
             while (true) {
-                Socket socket = serverSocket.accept();
+                socket = serverSocket.accept();
                 InetAddress clientInetAddress = socket.getInetAddress();
 //                logToTextView("Connected client from IP", clientInetAddress.toString());
                 Log.e(TAG, "Connected client from IP " + clientInetAddress.toString());
@@ -95,8 +97,10 @@ public class SocketController {
                         try {
                             wifiController.startConnection();
                         } catch (Exception e) {
-                            Log.e(TAG, "Socket closed: interrupting");
+                            Log.e(TAG, "Exception message: " + e.getMessage());
                             e.printStackTrace();
+                            Log.e(TAG, "Closing socket");
+                            socket.close();
                         }
 //                        wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
                     }
@@ -113,9 +117,20 @@ public class SocketController {
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "Socket closed: interrupting");
+            Log.e(TAG, "Exception message: " + e.getMessage());
             e.printStackTrace();
+
+            try {
+                socket.close();
+                Log.e(TAG, "Socket closed");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
+            // close presentation if opened
+            // close 8888 socket
         }
+        commandController.getService().stopPresentation();
     }
 
     public void close() throws IOException {
@@ -131,6 +146,14 @@ public class SocketController {
         Socket sock = null;
         try {
             sock = serverSocketFile.accept();
+
+            // TODO: remove presentation if exist
+            // Ideally this removing not needed, becaulse presentation must be removed before.
+            File file = new File(PRESENTATION_FILE_PATH);
+            if(file.exists()){
+                file.delete();
+                Log.e(TAG, "presentation.ezs DELETED");
+            }
 
             commandController.getService().showProgressDialogReceiving();
 //            logToTextView("Receiving presentation", PRESENTATION_FILE_PATH);
@@ -172,17 +195,24 @@ public class SocketController {
             }
         }
 
-        commandController.getService().showProgressDialogUnzip();
+        // TODO: think, maybe this check is not needed
+        File file = new File(PRESENTATION_FILE_PATH);
+        if(file.exists()){
+            commandController.getService().showProgressDialogUnzip();
 //        logToTextView("Unzip started", PRESENTATION_FILE_PATH);
-        Log.e(TAG, "Unzip started " + PRESENTATION_FILE_PATH);
-        Utils.unZipPresentation(PRESENTATION_FILE_PATH);
+            Log.e(TAG, "Unzip started " + PRESENTATION_FILE_PATH);
+            Utils.unZipPresentation(PRESENTATION_FILE_PATH);
 //        logToTextView("Unzip finished", PRESENTATION_FILE_PATH);
-        Log.e(TAG, "Unzip finished " + PRESENTATION_FILE_PATH);
-        commandController.getService().hideProgressDialog();
+            Log.e(TAG, "Unzip finished " + PRESENTATION_FILE_PATH);
+            commandController.getService().hideProgressDialog();
 
-        commandController.getService().showProgressDialogParsing();
-        Utils.createWorkArray();
-        commandController.getService().hideProgressDialog();
+            commandController.getService().showProgressDialogParsing();
+            Utils.createWorkArray();
+            commandController.getService().hideProgressDialog();
+        } else {
+            Log.e(TAG, "Presentation doesn't received");
+        }
+
     }
 
 //    private void logToTextView(final String message, final String variable) {

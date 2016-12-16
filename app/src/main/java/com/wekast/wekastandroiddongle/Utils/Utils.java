@@ -130,6 +130,14 @@ public class Utils {
         prefEditor.apply();
     }
 
+    public static boolean removeFromSharedPreferences(Context context, String field) {
+        SharedPreferences settingsActivity = context.getSharedPreferences(SHAREDPREFERNCE, context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settingsActivity.edit();
+        editor.remove(field);
+        editor.apply();
+        return true;
+    }
+
     public static void toastShow(Context context, String s) {
         Toast toast = Toast.makeText(context, s, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);

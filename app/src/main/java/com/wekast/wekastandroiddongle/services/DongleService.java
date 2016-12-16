@@ -96,7 +96,7 @@ public class DongleService extends Service {
 //                wifiController.logToTextView("DONGLE WAITING...", "");
             } else {
                 wifiController.changeState(WifiController.WifiState.WIFI_STATE_CONNECT);
-                wifiController.printInfoMessage("DONGLE WAITING...\n\n");
+//                wifiController.printInfoMessage("DISCONNECTED\n\nWAITING...\n\n");
             }
             socketController.waitForTask();
         } else if (wifiController.getSavedWifiState() == WifiController.WifiState.WIFI_STATE_CONNECT) {

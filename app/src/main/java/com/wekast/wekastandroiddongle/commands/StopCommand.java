@@ -30,8 +30,9 @@ public class StopCommand implements ICommand {
     public Answer execute() {
         controller.getService().stopPresentation();
         File file = new File(APP_PATH + "presentation.ezs");
+        // TODO: check if this is used
         if(file.delete())
-            printInfoMessage("DONGLE CONNECTED\n\nWAITING PRESENTATION\n\n");
+            printInfoMessage("CONNECTED\n\nWAITING PRESENTATION\n\n");
 //            logToTextView("Presentation", "removed");
         // TODO: clear cash directory
         Utils.clearWorkDirectory(APP_PATH + CASH_DIRECTORY);

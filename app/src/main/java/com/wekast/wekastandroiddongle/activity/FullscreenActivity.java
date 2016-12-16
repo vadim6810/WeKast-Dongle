@@ -79,6 +79,7 @@ public class FullscreenActivity extends AppCompatActivity {
 
         loggerView = (TextView) findViewById(R.id.logger);
         loggerView.setMovementMethod(new ScrollingMovementMethod());
+        loggerView.setText("DISCONNECTED\n\nWAITING CONNECTION\n\n");
 
 //        final Button button = (Button) findViewById(R.id.testButton);
 //        button.setOnClickListener(new View.OnClickListener() {
@@ -215,6 +216,7 @@ public class FullscreenActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(this, DongleService.class));
+        Utils.removeFromSharedPreferences(context, "WIFI_IS_CONNECTED_LAST_STATE");
 //        stopService(new Intent(this, IsWiFiConnectedService.class));
     }
 

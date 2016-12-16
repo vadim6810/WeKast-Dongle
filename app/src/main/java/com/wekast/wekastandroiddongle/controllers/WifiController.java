@@ -15,16 +15,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
-
 import com.wekast.wekastandroiddongle.R;
 import com.wekast.wekastandroiddongle.Utils.Utils;
 import com.wekast.wekastandroiddongle.activity.FullscreenActivity;
 import com.wekast.wekastandroiddongle.services.WifiConnected;
-
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import static com.wekast.wekastandroiddongle.Utils.Utils.PRESENTATION_FILE_PATH;
 
 public class WifiController {
 
@@ -292,7 +287,7 @@ public class WifiController {
                 videoView.setVisibility(View.INVISIBLE);
                 logoFrame.setBackgroundColor(Color.rgb(255, 255, 255));
                 loggerView.setVisibility(View.VISIBLE);
-                loggerView.setText("DONGLE CONNECTED\nWAITING PRESENTATION\n\n");
+                loggerView.setText("CONNECTED\nWAITING PRESENTATION\n\n");
             }
         });
     }
