@@ -124,6 +124,7 @@ public class SocketController {
                 socket.close();
                 Log.e(TAG, "Socket closed");
             } catch (IOException e1) {
+                Log.e(TAG, "Exception message2: " + e1.getMessage());
                 e1.printStackTrace();
             }
 
@@ -190,7 +191,7 @@ public class SocketController {
                 if (sock != null)
                     sock.close();
             } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
+                Log.e(TAG, "Message3" + e.getMessage());
                 e.printStackTrace();
             }
         }
